@@ -1,0 +1,490 @@
+<?xml version="1.0"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="AdapterTypeMetaData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="GuiHandlerClassName" />
+          <xs:element name="Type" type="xs:string" />
+          <xs:element name="GuiLabels">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" name="Label">
+                  <xs:complexType>
+                    <xs:simpleContent>
+                      <xs:extension base="xs:string">
+                        <xs:attribute name="language" type="xs:string" use="required" />
+                      </xs:extension>
+                    </xs:simpleContent>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="guid" type="xs:string"/>
+              <xs:attribute name="resourceId" type="xs:string"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Inbound">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="TransportProtocol">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="Name" type="xs:string" />
+                      <xs:element name="Version" />
+                      <xs:element name="GuiLabels">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element maxOccurs="unbounded" name="Label">
+                              <xs:complexType>
+                                <xs:simpleContent>
+                                  <xs:extension base="xs:string">
+                                    <xs:attribute name="language" type="xs:string" use="required" />
+                                  </xs:extension>
+                                </xs:simpleContent>
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:sequence>
+                          <xs:attribute name="guid" type="xs:string"/>
+                          <xs:attribute name="resourceId" type="xs:string" />
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="ValidMessageProtocols">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="ProtocolIdentifier">
+                              <xs:complexType>
+                                <xs:sequence>
+                                  <xs:element name="Name" type="xs:string" />
+                                  <xs:element name="Version" type="xs:unsignedShort" />
+                                </xs:sequence>
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:sequence>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="ChannelAttributes">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element maxOccurs="unbounded" name="Tab">
+                              <xs:complexType>
+                                <xs:sequence>
+                                  <xs:element maxOccurs="unbounded" name="AttributeGroup">
+                                    <xs:complexType>
+                                      <xs:sequence>
+                                        <xs:element name="Name" type="xs:string" />
+                                        <xs:element name="GuiLabels">
+                                          <xs:complexType>
+                                            <xs:sequence>
+                                              <xs:element maxOccurs="unbounded" name="Label">
+                                                <xs:complexType>
+                                                  <xs:simpleContent>
+                                                    <xs:extension base="xs:string">
+                                                      <xs:attribute name="language" type="xs:string" use="required" />
+                                                    </xs:extension>
+                                                  </xs:simpleContent>
+                                                </xs:complexType>
+                                              </xs:element>
+                                            </xs:sequence>
+                                            <xs:attribute name="guid" type="xs:string" />
+                                            <xs:attribute name="resourceId" type="xs:string" />
+                                          </xs:complexType>
+                                        </xs:element>
+                                        <xs:element maxOccurs="unbounded" name="AttributeReference">
+                                          <xs:complexType>
+                                            <xs:sequence>
+                                              <xs:element name="ReferenceName" type="xs:string" />
+                                              <xs:element minOccurs="0" name="AndCondition">
+                                                <xs:complexType>
+                                                  <xs:sequence>
+                                                    <xs:element maxOccurs="unbounded" name="EditCondition">
+                                                      <xs:complexType>
+                                                        <xs:sequence>
+                                                          <xs:element name="AttributeName" type="xs:string" />
+                                                          <xs:element name="AttributeValue" type="xs:string" />
+                                                        </xs:sequence>
+                                                      </xs:complexType>
+                                                    </xs:element>
+                                                    <xs:element minOccurs="0" name="OrCondition">
+                                                      <xs:complexType>
+                                                        <xs:sequence>
+                                                          <xs:element maxOccurs="unbounded" name="EditCondition">
+                                                            <xs:complexType>
+                                                              <xs:sequence>
+                                                                <xs:element name="AttributeName" type="xs:string" />
+                                                                <xs:element name="AttributeValue" type="xs:unsignedByte" />
+                                                              </xs:sequence>
+                                                            </xs:complexType>
+                                                          </xs:element>
+                                                        </xs:sequence>
+                                                      </xs:complexType>
+                                                    </xs:element>
+                                                  </xs:sequence>
+                                                </xs:complexType>
+                                              </xs:element>
+                                              <xs:element minOccurs="0" name="EditCondition">
+                                                <xs:complexType>
+                                                  <xs:sequence>
+                                                    <xs:element name="AttributeName" type="xs:string" />
+                                                    <xs:element name="AttributeValue" type="xs:string" />
+                                                  </xs:sequence>
+                                                </xs:complexType>
+                                              </xs:element>
+                                            </xs:sequence>
+                                          </xs:complexType>
+                                        </xs:element>
+                                      </xs:sequence>
+                                    </xs:complexType>
+                                  </xs:element>
+                                </xs:sequence>
+                                <xs:attribute name="id" type="xs:string" use="required" />
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:sequence>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="SecurityAttributes" />
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="MessageProtocol">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="Name" type="xs:string" />
+                      <xs:element name="Version" type="xs:unsignedShort" />
+                      <xs:element name="GuiLabels">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element maxOccurs="unbounded" name="Label">
+                              <xs:complexType>
+                                <xs:simpleContent>
+                                  <xs:extension base="xs:string">
+                                    <xs:attribute name="language" type="xs:string" use="required" />
+                                  </xs:extension>
+                                </xs:simpleContent>
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:sequence>
+                          <xs:attribute name="guid" type="xs:string"  />
+                          <xs:attribute name="resourceId" type="xs:string" />
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="ModuleProcessorAttributes">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="ModuleSequence">
+                              <xs:complexType>
+                                <xs:sequence>
+                                  <xs:element name="ModuleSequenceItem">
+                                    <xs:complexType>
+                                      <xs:sequence>
+                                        <xs:element name="Name" type="xs:string" />
+                                        <xs:element name="Type" type="xs:string" />
+                                        <xs:element name="Key" type="xs:unsignedByte" />
+                                      </xs:sequence>
+                                    </xs:complexType>
+                                  </xs:element>
+                                </xs:sequence>
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:sequence>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="GlobalChannelAttributes" />
+                <xs:element name="GlobalSecurityAttributes" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Outbound">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="TransportProtocol">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="Name" type="xs:string" />
+                      <xs:element name="Version" />
+                      <xs:element name="GuiLabels">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element maxOccurs="unbounded" name="Label">
+                              <xs:complexType>
+                                <xs:simpleContent>
+                                  <xs:extension base="xs:string">
+                                    <xs:attribute name="language" type="xs:string" use="required" />
+                                  </xs:extension>
+                                </xs:simpleContent>
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:sequence>
+                          <xs:attribute name="guid" type="xs:string"  />
+                          <xs:attribute name="resourceId" type="xs:string"  />
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="ValidMessageProtocols">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="ProtocolIdentifier">
+                              <xs:complexType>
+                                <xs:sequence>
+                                  <xs:element name="Name" type="xs:string" />
+                                  <xs:element name="Version" type="xs:unsignedShort" />
+                                </xs:sequence>
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:sequence>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="ChannelAttributes">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element maxOccurs="unbounded" name="Tab">
+                              <xs:complexType>
+                                <xs:sequence>
+                                  <xs:element maxOccurs="unbounded" name="AttributeGroup">
+                                    <xs:complexType>
+                                      <xs:sequence>
+                                        <xs:element name="Name" type="xs:string" />
+                                        <xs:element name="GuiLabels">
+                                          <xs:complexType>
+                                            <xs:sequence>
+                                              <xs:element maxOccurs="unbounded" name="Label">
+                                                <xs:complexType>
+                                                  <xs:simpleContent>
+                                                    <xs:extension base="xs:string">
+                                                      <xs:attribute name="language" type="xs:string" use="required" />
+                                                    </xs:extension>
+                                                  </xs:simpleContent>
+                                                </xs:complexType>
+                                              </xs:element>
+                                            </xs:sequence>
+                                            <xs:attribute name="guid" type="xs:string"  />
+                                            <xs:attribute name="resourceId" type="xs:string"  />
+                                          </xs:complexType>
+                                        </xs:element>
+                                        <xs:element maxOccurs="unbounded" name="AttributeReference">
+                                          <xs:complexType>
+                                            <xs:sequence>
+                                              <xs:element name="ReferenceName" type="xs:string" />
+                                              <xs:element minOccurs="0" name="AndCondition">
+                                                <xs:complexType>
+                                                  <xs:sequence>
+                                                    <xs:element maxOccurs="unbounded" name="EditCondition">
+                                                      <xs:complexType>
+                                                        <xs:sequence>
+                                                          <xs:element name="AttributeName" type="xs:string" />
+                                                          <xs:element name="AttributeValue" type="xs:string" />
+                                                        </xs:sequence>
+                                                      </xs:complexType>
+                                                    </xs:element>
+                                                  </xs:sequence>
+                                                </xs:complexType>
+                                              </xs:element>
+                                              <xs:element minOccurs="0" name="EditCondition">
+                                                <xs:complexType>
+                                                  <xs:sequence>
+                                                    <xs:element name="AttributeName" type="xs:string" />
+                                                    <xs:element name="AttributeValue" type="xs:string" />
+                                                  </xs:sequence>
+                                                </xs:complexType>
+                                              </xs:element>
+                                            </xs:sequence>
+                                          </xs:complexType>
+                                        </xs:element>
+                                      </xs:sequence>
+                                    </xs:complexType>
+                                  </xs:element>
+                                </xs:sequence>
+                                <xs:attribute name="id" type="xs:string" use="required" />
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:sequence>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="SecurityAttributes" />
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="MessageProtocol">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="Name" type="xs:string" />
+                      <xs:element name="Version" type="xs:unsignedShort" />
+                      <xs:element name="GuiLabels">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element maxOccurs="unbounded" name="Label">
+                              <xs:complexType>
+                                <xs:simpleContent>
+                                  <xs:extension base="xs:string">
+                                    <xs:attribute name="language" type="xs:string" use="required" />
+                                  </xs:extension>
+                                </xs:simpleContent>
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:sequence>
+                          <xs:attribute name="guid" type="xs:string"  />
+                          <xs:attribute name="resourceId" type="xs:string" />
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="ModuleProcessorAttributes">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="ModuleSequence">
+                              <xs:complexType>
+                                <xs:sequence>
+                                  <xs:element name="ModuleSequenceItem">
+                                    <xs:complexType>
+                                      <xs:sequence>
+                                        <xs:element name="Name" type="xs:string" />
+                                        <xs:element name="Type" type="xs:string" />
+                                        <xs:element name="Key" type="xs:unsignedByte" />
+                                      </xs:sequence>
+                                    </xs:complexType>
+                                  </xs:element>
+                                </xs:sequence>
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:sequence>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="GlobalChannelAttributes" />
+                <xs:element name="GlobalSecurityAttributes" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element maxOccurs="unbounded" name="Attribute">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Name" type="xs:string" />
+                <xs:element name="Usage" type="xs:string" />
+                <xs:element name="Default" type="xs:string" />
+                <xs:element name="DataType" type="xs:string" />
+                <xs:element minOccurs="0" name="Length" type="xs:string" />
+                <xs:element name="GuiLabels">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element maxOccurs="unbounded" name="Label">
+                        <xs:complexType>
+                          <xs:simpleContent>
+                            <xs:extension base="xs:string">
+                              <xs:attribute name="language" type="xs:string" use="required" />
+                            </xs:extension>
+                          </xs:simpleContent>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="guid" type="xs:string"  />
+                    <xs:attribute name="resourceId" type="xs:string"  />
+                  </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" name="Flag" type="xs:string" />
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="FixedValue">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="value" type="xs:string" />
+                      <xs:element name="GuiLabels">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element maxOccurs="unbounded" name="Label">
+                              <xs:complexType>
+                                <xs:simpleContent>
+                                  <xs:extension base="xs:string">
+                                    <xs:attribute name="language" type="xs:string" use="required" />
+                                  </xs:extension>
+                                </xs:simpleContent>
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:sequence>
+                          <xs:attribute name="guid" type="xs:string"  />
+                          <xs:attribute name="resourceId" type="xs:string" />
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="isPassword" type="xs:boolean"  />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="AttributeTable">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:choice maxOccurs="unbounded">
+                  <xs:element name="Name" type="xs:string" />
+                  <xs:element name="Usage" type="xs:string" />
+                  <xs:element maxOccurs="unbounded" name="AttributeReference">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="ReferenceName" type="xs:string" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="GuiLabels">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="Label">
+                          <xs:complexType>
+                            <xs:simpleContent>
+                              <xs:extension base="xs:string">
+                                <xs:attribute name="language" type="xs:string" use="required" />
+                              </xs:extension>
+                            </xs:simpleContent>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                      <xs:attribute name="guid" type="xs:string"  />
+                      <xs:attribute name="resourceId" type="xs:string"  />
+                    </xs:complexType>
+                  </xs:element>
+                </xs:choice>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="DynamicAttributes">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" name="AttributeReference">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="ReferenceName" type="xs:string" />
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="TabDefinition">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="GuiLabels">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element maxOccurs="unbounded" name="Label">
+                        <xs:complexType>
+                          <xs:simpleContent>
+                            <xs:extension base="xs:string">
+                              <xs:attribute name="language" type="xs:string" use="required" />
+                            </xs:extension>
+                          </xs:simpleContent>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="guid" type="xs:string"  />
+                    <xs:attribute name="resourceId" type="xs:string"  />
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:unsignedShort" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

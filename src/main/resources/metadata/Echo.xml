@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AdapterTypeMetaData version="71"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="adaptermetadata.xsd">
+    <Outbound>
+        <TransportProtocol>
+            <Name>Echo</Name>
+            <Version>1.0</Version>
+            <GuiLabels>
+                <Label language="EN">Echo</Label>
+            </GuiLabels>
+            <ValidMessageProtocols>
+                <ProtocolIdentifier>
+                    <Name>Echo</Name>
+                    <Version>1.0</Version>
+                </ProtocolIdentifier>
+            </ValidMessageProtocols>
+            <ChannelAttributes>
+                <Tab id="tab1">
+                    <AttributeGroup>
+                        <Name>tab1</Name>
+                        <GuiLabels>
+                            <Label language="EN">1</Label>
+                        </GuiLabels>
+                        <AttributeReference>
+                            <ReferenceName>A</ReferenceName>
+                        </AttributeReference>
+                    </AttributeGroup>
+                </Tab>
+            </ChannelAttributes>
+        </TransportProtocol>
+        <MessageProtocol>
+            <Name>Echo</Name>
+            <Version>1.0</Version>
+            <GuiLabels>
+                <Label language="EN">Echo</Label>
+            </GuiLabels>
+            <ModuleProcessorAttributes>
+                <ModuleSequence>
+                    <ModuleSequenceItem>
+                        <Name>localejbs/ModuleProcessorExitBean</Name>
+                        <Type>local</Type>
+                        <Key>exit</Key>
+                    </ModuleSequenceItem>
+                </ModuleSequence>
+                <ModuleConfig>
+                    <ModuleConfigItem>
+                        <Key>exit</Key>
+                        <Name>JNDIName</Name>
+                        <!-- see EchoAdapterConstants.jndi -->
+                        <Value>deployedAdapters/demo.echoadapter.ra/shareable/demo.echoadapter.ra</Value>
+                    </ModuleConfigItem>
+                </ModuleConfig>
+            </ModuleProcessorAttributes>
+        </MessageProtocol>
+
+    </Outbound>
+    <Attribute>
+        <Name>A</Name>
+        <Usage>optional</Usage>
+        <Default></Default>
+        <DataType>xsd:string</DataType>
+        <GuiLabels>
+            <Label language="EN">A</Label>
+        </GuiLabels>
+    </Attribute>
+</AdapterTypeMetaData>

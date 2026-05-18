@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:j2ee="http://java.sun.com/xml/ns/j2ee">
+	<xsd:annotation>
+		<xsd:documentation>
+      @(#)connector_1_5.xsds	1.26 03/21/03
+    </xsd:documentation>
+	</xsd:annotation>
+	<xsd:annotation>
+		<xsd:documentation>
+      Copyright 2004 SAP AG
+    </xsd:documentation>
+	</xsd:annotation>
+	<xsd:annotation>
+		<xsd:documentation><![CDATA[
+
+	This is the XML Schema for the Connector 1.5 additional deployment
+	descriptor.  The deployment descriptor must be named
+	"META-INF/connector-j2ee-engine.xml" in the connector's rar file.  
+
+	]]></xsd:documentation>
+	</xsd:annotation>
+	<xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd"/>
+	<xsd:import namespace="http://java.sun.com/xml/ns/j2ee" schemaLocation="http://java.sun.com/xml/ns/j2ee/j2ee_1_4.xsd"/>
+	<!-- **************************************************** -->
+	<xsd:element name="connector" type="connectorType">
+		<xsd:annotation>
+			<xsd:documentation>
+				The connector element is the root element of the additional
+			      deployment descriptor for the resource adapter. This element
+			      includes additional general information - resource adapter 
+			      jndi name and loader references.
+	      </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<!-- **************************************************** -->
+	<xsd:complexType name="pool-paramsType">
+		<xsd:annotation>
+			<xsd:documentation>
+        TO DO          .
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="max-connections-number" type="xsd:positiveInteger"/>
+			<xsd:element name="max-time-to-wait-connection" type="xsd:nonNegativeInteger" minOccurs="0"/>
+			<xsd:element name="expiration-control" type="expiration-controlType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="expiration-controlType">
+		<xsd:sequence>
+			<xsd:element name="connection-lifetime" type="xsd:nonNegativeInteger"/>
+			<xsd:element name="run-cleanup-thread-interval" type="xsd:positiveInteger"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="propertyType">
+		<xsd:sequence>
+			<xsd:element name="description" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="config-property-name" type="xsd:string"/>
+			<xsd:element name="config-property-value" type="xsd:string"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID"/>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="connection-definitionType">
+		<xsd:sequence>
+			<xsd:element name="connectionfactory-interface" type="xsd:string"/>
+			<xsd:element name="jndi-name" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="alias" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="destination-name" type="xsd:string" minOccurs="0" maxOccurs="1"/> <!-- new security mechanism - Security Destination -->
+			<xsd:element name="authentication-mechanism-type" type="xsd:string" minOccurs="0"/> <!-- deprecated -->
+			<xsd:element name="authentication-type" type="xsd:string" minOccurs="0"/> <!-- deprecated -->
+			<xsd:element name="user-store" type="xsd:string" minOccurs="0"/> <!-- deprecated -->
+			<xsd:element name="identity-subject" type="identity-subjectType" minOccurs="0" maxOccurs="unbounded"/> <!-- deprecated -->
+			<xsd:element name="pool-params" type="pool-paramsType" minOccurs="0"/>
+			<!-- TO DO authentication-typeType -->
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID"/>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="connectorType">
+		<xsd:annotation>
+			<xsd:documentation>
+			        The connectorType defines a resource adapter.
+		      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="description" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="resourceadapter" type="resourceadapterType"/>
+			<xsd:choice minOccurs="0" maxOccurs="1">
+				<xsd:element name="template" type="j2ee:emptyType"/>
+				<xsd:element name="clonning" type="clonningType"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="inbound-resourceadapterType">
+		<xsd:annotation>
+			<xsd:documentation>
+   	 The inbound-resourceadapterType specifies additional information
+	 about an inbound resource adapter.
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="messageadapter" type="messageadapterType" minOccurs="0">
+				<xsd:unique name="messagelistener-type-uniqueness">
+					<xsd:annotation>
+						<xsd:documentation>
+						      The messagelistener-type element content must be
+						      unique in the messageadapter. Multiple messagelisteners
+						      can not use the same messagelistener-type.
+						</xsd:documentation>
+					</xsd:annotation>
+					<xsd:selector xpath="messagelistener"/>
+					<xsd:field xpath="messagelistener-type"/>
+				</xsd:unique>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="messageadapterType">
+		<xsd:sequence>
+			<xsd:element name="messagelistener" type="messagelistenerType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="messagelistenerType">
+		<xsd:sequence>
+			<xsd:element name="messagelistener-type" type="xsd:string"/>
+			<xsd:element name="messagelistener-name" type="xsd:string"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID"/>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="outbound-resourceadapterType">
+		<xsd:annotation>
+			<xsd:documentation>
+  	 The outbound-resourceadapterType specifies additional information about
+	 an outbound resource adapter.
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="connection-definition" type="connection-definitionType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="resourceadapterType">
+		<xsd:annotation>
+			<xsd:documentation>
+        The resourceadapterType specifies additional information about the
+	   resource adapter. 
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ra-jndi-name" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="outbound-resourceadapter" type="outbound-resourceadapterType" minOccurs="0">
+				<xsd:unique name="connection-definition-jndi-name-uniqueness">
+					<xsd:annotation>
+						<xsd:documentation>
+						      The jndi-name element content must be unique in the
+						      outbound-resourceadapter. Multiple connection-definitions
+						      can not use the same jndi-name.
+					    </xsd:documentation>
+					</xsd:annotation>
+					<xsd:selector xpath="connection-definition"/>
+					<xsd:field xpath="jndi-name"/>
+				</xsd:unique>
+				<xsd:unique name="connectionfactory-interface-uniqueness">
+					<xsd:annotation>
+						<xsd:documentation>
+						      The connectionfactory-interface element content
+						      must be unique in the outbound-resourceadapter.
+						      Multiple connection-definitions can not use the
+						      same connectionfactory-interface.
+					      </xsd:documentation>
+					</xsd:annotation>
+					<xsd:selector xpath="connection-definition"/>
+					<xsd:field xpath="connectionfactory-interface"/>
+				</xsd:unique>
+			</xsd:element>
+			<xsd:element name="inbound-resourceadapter" type="inbound-resourceadapterType" minOccurs="0"/>
+			<xsd:element name="adminobjects" type="adminobjectsType" minOccurs="0">
+				<xsd:unique name="adminobject-interface-uniqueness">
+					<xsd:annotation>
+						<xsd:documentation>
+						      The adminobject-interface element content
+						      must be unique in the adminobjects.
+						      Multiple adminobjects can not use the
+						      same adminobject-interface.
+					      </xsd:documentation>
+					</xsd:annotation>
+					<xsd:selector xpath="adminobject"/>
+					<xsd:field xpath="adminobject-interface"/>
+				</xsd:unique>
+			</xsd:element>
+			<xsd:element name="loader-references" type="loader-referencesType" minOccurs="0"/>
+			<xsd:element name="workmanager-settings" type="workmanager-settingsType" minOccurs="0"/>
+			<xsd:element name="extended-properties" type="extended-propertiesType" minOccurs="0"/>
+			<xsd:element name="destination-name" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+		<xsd:attribute name="apply-updated" use="optional"/>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="adminobjectsType">
+		<xsd:annotation>
+			<xsd:documentation>
+			   The adminobjectsType specifies additional information about the adminobjects. 
+		      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="adminobject" type="adminobjectType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:unique name="adminobject-jndi-name-uniqueness">
+					<xsd:annotation>
+						<xsd:documentation>
+						      The jndi-name element content must be
+						      unique in the adminobjects. Multiple adminobjects
+						      can not use the same jndi-name.
+					    </xsd:documentation>
+					</xsd:annotation>
+					<xsd:selector xpath="adminobject-instance"/>
+					<xsd:field xpath="jndi-name"/>
+				</xsd:unique>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID"/>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="adminobjectType">
+		<xsd:annotation>
+			<xsd:documentation>
+			   The adminobjectType specifies additional information about an 
+			   adminobject with particuar adminobject-interface. 
+		      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="adminobject-interface" type="j2ee:fully-qualified-classType">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+						The adminobject-interface element must be unique for all adminobject elements
+						and there must be a one-to-one relationship between the adminobject-interface element
+						in connector-j2ee-engine.xml and the adminobject-interface element in ra.xml.
+						Example:
+							<adminobject-interface>javax.jms.Destination
+							</adminobject-interface>
+				      ]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="adminobject-instance" type="adminobject-instanceType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID"/>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="adminobject-instanceType">
+		<xsd:annotation>
+			<xsd:documentation>
+				Each element represents a configured instance of an administered object with given adminobject-interface.
+		      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="jndi-name" type="xsdStringType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Specifies the JNDI name of the administered object configured instance.
+				      </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="config-property" type="config-propertyType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID"/>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="xsdStringType">
+		<xsd:annotation>
+			<xsd:documentation>
+				This type adds an "id" attribute to xsd:string.
+		      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="id" type="xsd:ID"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="descriptionType">
+		<xsd:annotation>
+			<xsd:documentation>
+				The description type is used by a description element to
+				provide text describing the parent element.  The elements
+				that use this type should include any information that the
+				Deployment Component's Deployment File file producer wants
+				to provide to the consumer of the Deployment Component's
+				Deployment File (i.e., to the Deployer). Typically, the
+				tools used by such a Deployment File consumer will display
+				the description when processing the parent element that
+				contains the description.
+				The lang attribute defines the language that the
+				description is provided in. The default value is "en" (English).
+		      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="xsdStringType">
+				<xsd:attribute ref="xml:lang"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="config-property-typeType">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+				  The config-property-typeType contains the fully
+				  qualified Java type of a configuration property.
+				  The following are the legal values:
+				     java.lang.Boolean, java.lang.String, java.lang.Integer,
+				     java.lang.Double, java.lang.Byte, java.lang.Short,
+				     java.lang.Long, java.lang.Float, java.lang.Character
+				  Used in: config-property
+				  Example:
+					  <config-property-type>java.lang.String</config-property-type>
+			  ]]></xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="xsdStringType">
+				<xsd:enumeration value="java.lang.Boolean"/>
+				<xsd:enumeration value="java.lang.String"/>
+				<xsd:enumeration value="java.lang.Integer"/>
+				<xsd:enumeration value="java.lang.Double"/>
+				<xsd:enumeration value="java.lang.Byte"/>
+				<xsd:enumeration value="java.lang.Short"/>
+				<xsd:enumeration value="java.lang.Long"/>
+				<xsd:enumeration value="java.lang.Float"/>
+				<xsd:enumeration value="java.lang.Character"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="config-propertyType">
+		<xsd:annotation>
+			<xsd:documentation>
+				The config-propertyType contains a declaration of a single
+				configuration property that may be used for providing
+				configuration information.
+				The declaration consists of an optional description, name,
+				type and an optional value of the configuration property. If
+				the resource adapter provider does not specify a value than
+				the deployer is responsible for providing a valid value for
+				a configuration property.
+				Any bounds or well-defined values of properties should be
+				described in the description element.
+		      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="description" type="descriptionType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="config-property-name" type="xsdStringType"/>
+			<xsd:element name="config-property-type" type="config-property-typeType"/>
+			<xsd:element name="config-property-value" type="xsdStringType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					      The element config-property-value contains the value
+					      of a configuration entry. Note, it is possible for a
+					      resource adapter deployer to override this
+					      configuration information during deployment.
+					      Example:
+						      	<config-property-value>WombatServer</config-property-value>
+				      ]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID"/>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="loader-referencesType">
+	 <xsd:sequence>
+	  <xsd:element name="loader-name" maxOccurs="unbounded">
+	   <xsd:complexType>
+	    <xsd:simpleContent>
+	     <xsd:extension base="xsd:string">
+	       <xsd:attribute name="strength" use="optional">
+		 <xsd:simpleType>
+		   <xsd:restriction base="xsd:NMTOKEN">
+	             <xsd:enumeration value="weak"/>
+		     <xsd:enumeration value="hard"/>
+	           </xsd:restriction>
+	         </xsd:simpleType>
+	       </xsd:attribute>
+	     </xsd:extension>
+	    </xsd:simpleContent>
+	   </xsd:complexType>
+	  </xsd:element> 
+	 </xsd:sequence>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="extended-propertiesType">
+		<xsd:sequence>
+			<xsd:element name="property" type="propertyType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="identity-subjectType">
+		<xsd:sequence>
+			<xsd:element name="caller-principal" type="caller-principalType" minOccurs="0"/>
+			<xsd:element name="resource-principal" type="resource-principalType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="caller-principalType">
+		<xsd:sequence>
+			<xsd:element name="group-name" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="user-name" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="resource-principalType">
+		<xsd:sequence>
+			<xsd:element name="user-name" type="xsd:string"/>
+			<xsd:element name="user-password" type="xsd:string" minOccurs="0"/>
+			<!-- TO DO why not mandatory-->
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="workmanager-settingsType">
+		<xsd:sequence>
+			<xsd:element name="max-thread-count" type="xsd:positiveInteger" minOccurs="0"/>
+			<xsd:element name="start-thread-timeout" type="xsd:nonNegativeInteger" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- **************************************************** -->
+	<xsd:complexType name="clonningType">
+		<xsd:sequence>
+			<xsd:element name="template-app-name" type="xsdStringType"/>
+			<xsd:element name="template-ra-name" type="xsdStringType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

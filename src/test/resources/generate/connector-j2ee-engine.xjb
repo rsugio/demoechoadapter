@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<jxb:bindings version="2.1" 
+              xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <jxb:bindings schemaLocation="connector-j2ee-engine.xsd">
+    <jxb:bindings node="//xs:complexType[@name='xsdStringType']">
+      <jxb:class name="XsdStringType2"/>
+    </jxb:bindings>
+  </jxb:bindings>
+  <jxb:bindings schemaLocation="connector-j2ee-engine.xsd">
+    <jxb:bindings node="//xs:complexType[@name='descriptionType']">
+      <jxb:class name="DescriptionType2"/>
+    </jxb:bindings>
+  </jxb:bindings>
+
+
+</jxb:bindings>

@@ -1,0 +1,13 @@
+
+com.sap.aii.adapter.sample.ra.jar1  - sample
+com.sap.aii.af.cpa.svc.api.jar
+com.sap.aii.af.lib.mod.jar
+com.sap.aii.af.ms.ifc_api.jar
+com.sap.aii.af.svc_api.jar
+com.sap.aii.sec.lib_api.jar
+connector.jar
+sap.com~tc~bl~guidgenerator~impl.jar
+sap.com~tc~bl~txmanagerimpl~plb~impl.jar
+sap.com~tc~je~appcontext_api~API.jar
+sap.com~tc~logging~java~impl.jar
+sap.com~tc~sec~ssf.jar

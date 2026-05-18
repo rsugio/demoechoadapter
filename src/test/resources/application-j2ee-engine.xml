@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE application-j2ee-engine SYSTEM 'application-j2ee-engine.dtd'>
+<application-j2ee-engine>
+<!-- ume-permissions for servlet -->
+<!--reference reference-type="hard">
+	<reference-target provider-name="sap.com" target-type="library">com.sap.security.api.sda</reference-target>
+</reference>
+<reference reference-type="hard">
+	<reference-target provider-name="sap.com" target-type="library">iaik.lib.facade</reference-target>
+</reference-->
+<reference reference-type="hard">
+	<reference-target provider-name="sap.com" target-type="library">engine.jee5.facade</reference-target>
+</reference>
+<reference reference-type="hard">
+	<reference-target provider-name="sap.com" target-type="library">com.sap.base.technology.facade</reference-target>
+</reference>
+<reference reference-type="hard">
+	<reference-target provider-name="sap.com" target-type="library">com.sap.aii.af.lib.facade</reference-target>
+</reference>
+<!--reference reference-type="hard">
+	<reference-target provider-name="sap.com" target-type="library">tc~bl~httpclient~lib</reference-target>
+</reference-->
+<reference reference-type="hard">
+	<reference-target provider-name="sap.com" target-type="interface">com.sap.aii.af.ifc.facade</reference-target>
+</reference>
+<!--reference reference-type="hard">
+	<reference-target provider-name="sap.com" target-type="service">tc/je/appconfiguration/api</reference-target>
+</reference-->
+<reference reference-type="hard">
+	<reference-target provider-name="sap.com" target-type="service">com.sap.aii.af.svc.facade</reference-target>
+</reference>
+<reference reference-type="hard">
+	<reference-target provider-name="sap.com" target-type="service">com.sap.aii.adapter.xi.svc</reference-target>
+</reference>
+<!--reference reference-type="weak">
+	<reference-target provider-name="sap.com" target-type="application">com.sap.xi.directory</reference-target>
+</reference>
+<reference reference-type="hard">
+	<reference-target provider-name="sap.com" target-type="library">com.sap.aii.adapter.odata.lib</reference-target>
+</reference>
+<reference reference-type="hard">
+	<reference-target provider-name="sap.com" target-type="application">com.sap.aii.adapter.picao.util.app</reference-target>
+</reference-->
+<fail-over-enable mode="disable"/>
+</application-j2ee-engine>

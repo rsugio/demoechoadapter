@@ -1,0 +1,3 @@
+
+REWRITE_SYSTEM "http://java.sun.com/xml/ns/j2ee/" "."
+REWRITE_SYSTEM "http://www.ibm.com/webservices/xsd/" "."

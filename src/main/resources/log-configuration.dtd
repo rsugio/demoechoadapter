@@ -1,0 +1,57 @@
+<!ENTITY % severities "(NONE|FATAL|ERROR|WARNING|INFO|PATH|DEBUG|ALL)">
+<!ENTITY % association-types "(PRIVATE_LOG|LOCAL_LOG|LOG)">
+<!ENTITY % boolean "(TRUE | FALSE)">
+
+<!ELEMENT log-configuration (log-formatters?, log-destinations?, log-controllers?)>
+
+<!ELEMENT log-formatters          (log-formatter*)>
+<!ELEMENT log-destinations        (log-destination*)>
+<!ELEMENT log-controllers         (log-controller*)>
+<!ELEMENT log-filters             (log-filter*)>
+<!ELEMENT associated-destinations ((destination-ref|anonymous-destination)*)>
+
+<!ELEMENT log-formatter     EMPTY>
+<!ATTLIST log-formatter     name CDATA      #REQUIRED>
+<!ATTLIST log-formatter     type NMTOKEN    #REQUIRED>
+<!ATTLIST log-formatter     pattern CDATA   #IMPLIED>
+
+<!ELEMENT log-destination   ((formatter-ref|anonymous-formatter)?, log-filters?)>
+<!ATTLIST log-destination   name ID         #REQUIRED>
+<!ATTLIST log-destination   type NMTOKEN    #REQUIRED>
+<!ATTLIST log-destination   pattern CDATA   #IMPLIED>
+<!ATTLIST log-destination   effective-severity %severities; #IMPLIED>
+<!ATTLIST log-destination   encoding CDATA  #IMPLIED>
+<!ATTLIST log-destination   count CDATA     #IMPLIED>
+<!ATTLIST log-destination   limit CDATA     #IMPLIED>
+
+<!ELEMENT formatter-ref     EMPTY>
+<!ATTLIST formatter-ref     name CDATA #REQUIRED>
+
+<!ELEMENT anonymous-formatter     EMPTY>
+<!ATTLIST anonymous-formatter     type NMTOKEN #REQUIRED>
+
+<!ELEMENT log-controller  (relative-severity*, associated-destinations?, log-filters?)>
+<!ATTLIST log-controller  name                      CDATA #REQUIRED>
+<!ATTLIST log-controller  effective-severity %severities; #IMPLIED>
+<!ATTLIST log-controller  minimum-severity   %severities; #IMPLIED>
+<!ATTLIST log-controller  maximum-severity   %severities; #IMPLIED>
+<!ATTLIST log-controller  bundle-name               CDATA #IMPLIED>
+<!ATTLIST log-controller  db-log                %boolean; #IMPLIED>
+
+<!ELEMENT relative-severity  EMPTY>
+<!ATTLIST relative-severity  relative-controller  CDATA #REQUIRED>
+<!ATTLIST relative-severity  value         %severities; #IMPLIED>
+<!ATTLIST relative-severity  minimum-value %severities; #IMPLIED>
+<!ATTLIST relative-severity  maximum-value %severities; #IMPLIED>
+
+<!ELEMENT log-filter        EMPTY>
+<!ATTLIST log-filter        type NMTOKEN #REQUIRED>
+
+<!ELEMENT destination-ref   EMPTY>
+<!ATTLIST destination-ref   name IDREF #REQUIRED>
+<!ATTLIST destination-ref   association-type %association-types; #REQUIRED>
+
+<!ELEMENT anonymous-destination   EMPTY>
+<!ATTLIST anonymous-destination   type NMTOKEN #REQUIRED>
+<!ATTLIST anonymous-destination   association-type %association-types; #REQUIRED>
+

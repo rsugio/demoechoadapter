@@ -1,0 +1,513 @@
+ (4)
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+          <!-- XML Schema Generated from XML Document on Sun May 17 2026 12:34:43 GMT+0300 (Москва, стандартное время) -->
+          <!-- with XmlGrid.net Free Online Service http://xmlgrid.net -->
+       <xs:element name="AdapterTypeMetaData">
+              <xs:complexType>
+                     <xs:sequence>
+                            <xs:element name="GuiHandlerClassName"></xs:element>
+                            <xs:element name="Type" type="xs:string"></xs:element>
+                            <xs:element name="GuiLabels">
+                                   <xs:complexType>
+                                          <xs:sequence>
+                                                 <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                        <xs:complexType>
+                                                               <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                             </xs:sequence>
+                                          <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                          <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                      </xs:complexType>
+                               </xs:element>
+                            <xs:element name="Inbound">
+                                   <xs:complexType>
+                                          <xs:sequence>
+                                                 <xs:element name="TransportProtocol">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="Name" type="xs:string"></xs:element>
+                                                                      <xs:element name="Version"></xs:element>
+                                                                      <xs:element name="GuiLabels">
+                                                                             <xs:complexType>
+                                                                                    <xs:sequence>
+                                                                                           <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                                                  <xs:complexType>
+                                                                                                         <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                                     </xs:complexType>
+                                                                                              </xs:element>
+                                                                                       </xs:sequence>
+                                                                                    <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                                                    <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                      <xs:element name="ValidMessageProtocols">
+                                                                             <xs:complexType>
+                                                                                    <xs:sequence>
+                                                                                           <xs:element name="ProtocolIdentifier">
+                                                                                                  <xs:complexType>
+                                                                                                         <xs:sequence>
+                                                                                                                <xs:element name="Name" type="xs:string"></xs:element>
+                                                                                                                <xs:element name="Version" type="xs:int"></xs:element>
+                                                                                                            </xs:sequence>
+                                                                                                     </xs:complexType>
+                                                                                              </xs:element>
+                                                                                       </xs:sequence>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                      <xs:element name="ChannelAttributes">
+                                                                             <xs:complexType>
+                                                                                    <xs:sequence>
+                                                                                           <xs:element name="Tab" maxOccurs="unbounded">
+                                                                                                  <xs:complexType>
+                                                                                                         <xs:sequence>
+                                                                                                                <xs:element name="AttributeGroup" maxOccurs="unbounded">
+                                                                                                                       <xs:complexType>
+                                                                                                                              <xs:sequence>
+                                                                                                                                     <xs:element name="Name" type="xs:string"></xs:element>
+                                                                                                                                     <xs:element name="GuiLabels">
+                                                                                                                                            <xs:complexType>
+                                                                                                                                                   <xs:sequence>
+                                                                                                                                                          <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                                                                                                                 <xs:complexType>
+                                                                                                                                                                        <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                                                                                                    </xs:complexType>
+                                                                                                                                                             </xs:element>
+                                                                                                                                                      </xs:sequence>
+                                                                                                                                                   <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                                                                                                                   <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                                                                                                               </xs:complexType>
+                                                                                                                                        </xs:element>
+                                                                                                                                     <xs:element name="AttributeReference">
+                                                                                                                                            <xs:complexType>
+                                                                                                                                                   <xs:sequence>
+                                                                                                                                                          <xs:element name="ReferenceName" type="xs:string"></xs:element>
+                                                                                                                                                      </xs:sequence>
+                                                                                                                                               </xs:complexType>
+                                                                                                                                        </xs:element>
+                                                                                                                                 </xs:sequence>
+                                                                                                                          </xs:complexType>
+                                                                                                                   </xs:element>
+                                                                                                            </xs:sequence>
+                                                                                                         <xs:attribute name="id" type="xs:string"></xs:attribute>
+                                                                                                     </xs:complexType>
+                                                                                              </xs:element>
+                                                                                       </xs:sequence>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                      <xs:element name="SecurityAttributes"></xs:element>
+                                                                  </xs:sequence>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                                 <xs:element name="MessageProtocol">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="Name" type="xs:string"></xs:element>
+                                                                      <xs:element name="Version" type="xs:int"></xs:element>
+                                                                      <xs:element name="GuiLabels">
+                                                                             <xs:complexType>
+                                                                                    <xs:sequence>
+                                                                                           <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                                                  <xs:complexType>
+                                                                                                         <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                                     </xs:complexType>
+                                                                                              </xs:element>
+                                                                                       </xs:sequence>
+                                                                                    <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                                                    <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                      <xs:element name="ModuleProcessorAttributes">
+                                                                             <xs:complexType>
+                                                                                    <xs:sequence>
+                                                                                           <xs:element name="ModuleSequence">
+                                                                                                  <xs:complexType>
+                                                                                                         <xs:sequence>
+                                                                                                                <xs:element name="ModuleSequenceItem">
+                                                                                                                       <xs:complexType>
+                                                                                                                              <xs:sequence>
+                                                                                                                                     <xs:element name="Name" type="xs:string"></xs:element>
+                                                                                                                                     <xs:element name="Type" type="xs:string"></xs:element>
+                                                                                                                                     <xs:element name="Key" type="xs:int"></xs:element>
+                                                                                                                                 </xs:sequence>
+                                                                                                                          </xs:complexType>
+                                                                                                                   </xs:element>
+                                                                                                            </xs:sequence>
+                                                                                                     </xs:complexType>
+                                                                                              </xs:element>
+                                                                                       </xs:sequence>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                  </xs:sequence>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                                 <xs:element name="GlobalChannelAttributes"></xs:element>
+                                                 <xs:element name="GlobalSecurityAttributes"></xs:element>
+                                             </xs:sequence>
+                                      </xs:complexType>
+                               </xs:element>
+                            <xs:element name="Outbound">
+                                   <xs:complexType>
+                                          <xs:sequence>
+                                                 <xs:element name="TransportProtocol">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="Name" type="xs:string"></xs:element>
+                                                                      <xs:element name="Version"></xs:element>
+                                                                      <xs:element name="GuiLabels">
+                                                                             <xs:complexType>
+                                                                                    <xs:sequence>
+                                                                                           <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                                                  <xs:complexType>
+                                                                                                         <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                                     </xs:complexType>
+                                                                                              </xs:element>
+                                                                                       </xs:sequence>
+                                                                                    <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                                                    <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                      <xs:element name="ValidMessageProtocols">
+                                                                             <xs:complexType>
+                                                                                    <xs:sequence>
+                                                                                           <xs:element name="ProtocolIdentifier">
+                                                                                                  <xs:complexType>
+                                                                                                         <xs:sequence>
+                                                                                                                <xs:element name="Name" type="xs:string"></xs:element>
+                                                                                                                <xs:element name="Version" type="xs:int"></xs:element>
+                                                                                                            </xs:sequence>
+                                                                                                     </xs:complexType>
+                                                                                              </xs:element>
+                                                                                       </xs:sequence>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                      <xs:element name="ChannelAttributes">
+                                                                             <xs:complexType>
+                                                                                    <xs:sequence>
+                                                                                           <xs:element name="Tab" maxOccurs="unbounded">
+                                                                                                  <xs:complexType>
+                                                                                                         <xs:sequence>
+                                                                                                                <xs:element name="AttributeGroup" maxOccurs="unbounded">
+                                                                                                                       <xs:complexType>
+                                                                                                                              <xs:sequence>
+                                                                                                                                     <xs:element name="Name" type="xs:string"></xs:element>
+                                                                                                                                     <xs:element name="GuiLabels">
+                                                                                                                                            <xs:complexType>
+                                                                                                                                                   <xs:sequence>
+                                                                                                                                                          <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                                                                                                                 <xs:complexType>
+                                                                                                                                                                        <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                                                                                                    </xs:complexType>
+                                                                                                                                                             </xs:element>
+                                                                                                                                                      </xs:sequence>
+                                                                                                                                                   <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                                                                                                                   <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                                                                                                               </xs:complexType>
+                                                                                                                                        </xs:element>
+                                                                                                                                     <xs:element name="AttributeReference">
+                                                                                                                                            <xs:complexType>
+                                                                                                                                                   <xs:sequence>
+                                                                                                                                                          <xs:element name="ReferenceName" type="xs:string"></xs:element>
+                                                                                                                                                      </xs:sequence>
+                                                                                                                                               </xs:complexType>
+                                                                                                                                        </xs:element>
+                                                                                                                                 </xs:sequence>
+                                                                                                                          </xs:complexType>
+                                                                                                                   </xs:element>
+                                                                                                            </xs:sequence>
+                                                                                                         <xs:attribute name="id" type="xs:string"></xs:attribute>
+                                                                                                     </xs:complexType>
+                                                                                              </xs:element>
+                                                                                       </xs:sequence>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                      <xs:element name="SecurityAttributes"></xs:element>
+                                                                  </xs:sequence>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                                 <xs:element name="MessageProtocol">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="Name" type="xs:string"></xs:element>
+                                                                      <xs:element name="Version" type="xs:int"></xs:element>
+                                                                      <xs:element name="GuiLabels">
+                                                                             <xs:complexType>
+                                                                                    <xs:sequence>
+                                                                                           <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                                                  <xs:complexType>
+                                                                                                         <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                                     </xs:complexType>
+                                                                                              </xs:element>
+                                                                                       </xs:sequence>
+                                                                                    <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                                                    <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                      <xs:element name="ModuleProcessorAttributes">
+                                                                             <xs:complexType>
+                                                                                    <xs:sequence>
+                                                                                           <xs:element name="ModuleSequence">
+                                                                                                  <xs:complexType>
+                                                                                                         <xs:sequence>
+                                                                                                                <xs:element name="ModuleSequenceItem">
+                                                                                                                       <xs:complexType>
+                                                                                                                              <xs:sequence>
+                                                                                                                                     <xs:element name="Name" type="xs:string"></xs:element>
+                                                                                                                                     <xs:element name="Type" type="xs:string"></xs:element>
+                                                                                                                                     <xs:element name="Key" type="xs:int"></xs:element>
+                                                                                                                                 </xs:sequence>
+                                                                                                                          </xs:complexType>
+                                                                                                                   </xs:element>
+                                                                                                            </xs:sequence>
+                                                                                                     </xs:complexType>
+                                                                                              </xs:element>
+                                                                                       </xs:sequence>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                  </xs:sequence>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                                 <xs:element name="GlobalChannelAttributes"></xs:element>
+                                                 <xs:element name="GlobalSecurityAttributes"></xs:element>
+                                             </xs:sequence>
+                                      </xs:complexType>
+                               </xs:element>
+                            <xs:element name="Attribute" maxOccurs="unbounded">
+                                   <xs:complexType>
+                                          <xs:sequence>
+                                                 <xs:element name="Name" type="xs:string"></xs:element>
+                                                 <xs:element name="Usage" type="xs:string"></xs:element>
+                                                 <xs:element name="Default" type="xs:string"></xs:element>
+                                                 <xs:element name="DataType" type="xs:string"></xs:element>
+                                                 <xs:element name="Length" type="xs:int"></xs:element>
+                                                 <xs:element name="GuiLabels">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                             <xs:complexType>
+                                                                                    <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                  </xs:sequence>
+                                                               <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                               <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                                 <xs:element name="FixedValue" maxOccurs="unbounded">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="value" type="xs:string"></xs:element>
+                                                                      <xs:element name="GuiLabels">
+                                                                             <xs:complexType>
+                                                                                    <xs:sequence>
+                                                                                           <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                                                  <xs:complexType>
+                                                                                                         <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                                     </xs:complexType>
+                                                                                              </xs:element>
+                                                                                       </xs:sequence>
+                                                                                    <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                                                    <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                  </xs:sequence>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                             </xs:sequence>
+                                      </xs:complexType>
+                               </xs:element>
+                            <xs:element name="AttributeTable">
+                                   <xs:complexType>
+                                          <xs:sequence>
+                                                 <xs:element name="Name" type="xs:string"></xs:element>
+                                                 <xs:element name="Usage" type="xs:string"></xs:element>
+                                                 <xs:element name="AttributeReference" maxOccurs="unbounded">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="ReferenceName" type="xs:string"></xs:element>
+                                                                  </xs:sequence>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                                 <xs:element name="GuiLabels">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                             <xs:complexType>
+                                                                                    <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                  </xs:sequence>
+                                                               <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                               <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                             </xs:sequence>
+                                      </xs:complexType>
+                               </xs:element>
+                            <xs:element name="Attribute" maxOccurs="unbounded">
+                                   <xs:complexType>
+                                          <xs:sequence>
+                                                 <xs:element name="Name" type="xs:string"></xs:element>
+                                                 <xs:element name="Usage" type="xs:string"></xs:element>
+                                                 <xs:element name="Default"></xs:element>
+                                                 <xs:element name="DataType" type="xs:string"></xs:element>
+                                                 <xs:element name="Length" type="xs:int"></xs:element>
+                                                 <xs:element name="GuiLabels">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                             <xs:complexType>
+                                                                                    <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                  </xs:sequence>
+                                                               <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                               <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                             </xs:sequence>
+                                      </xs:complexType>
+                               </xs:element>
+                            <xs:element name="AttributeTable">
+                                   <xs:complexType>
+                                          <xs:sequence>
+                                                 <xs:element name="Name" type="xs:string"></xs:element>
+                                                 <xs:element name="Usage" type="xs:string"></xs:element>
+                                                 <xs:element name="GuiLabels">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                             <xs:complexType>
+                                                                                    <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                  </xs:sequence>
+                                                               <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                               <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                                 <xs:element name="AttributeReference" maxOccurs="unbounded">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="ReferenceName" type="xs:string"></xs:element>
+                                                                  </xs:sequence>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                             </xs:sequence>
+                                      </xs:complexType>
+                               </xs:element>
+                            <xs:element name="Attribute" maxOccurs="unbounded">
+                                   <xs:complexType>
+                                          <xs:sequence>
+                                                 <xs:element name="Name" type="xs:string"></xs:element>
+                                                 <xs:element name="Usage" type="xs:string"></xs:element>
+                                                 <xs:element name="Default"></xs:element>
+                                                 <xs:element name="DataType" type="xs:string"></xs:element>
+                                                 <xs:element name="Length" type="xs:int"></xs:element>
+                                                 <xs:element name="GuiLabels">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                             <xs:complexType>
+                                                                                    <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                  </xs:sequence>
+                                                               <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                               <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                             </xs:sequence>
+                                      </xs:complexType>
+                               </xs:element>
+                            <xs:element name="AttributeTable">
+                                   <xs:complexType>
+                                          <xs:sequence>
+                                                 <xs:element name="Name" type="xs:string"></xs:element>
+                                                 <xs:element name="Usage" type="xs:string"></xs:element>
+                                                 <xs:element name="GuiLabels">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                             <xs:complexType>
+                                                                                    <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                  </xs:sequence>
+                                                               <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                               <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                                 <xs:element name="AttributeReference" maxOccurs="unbounded">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="ReferenceName" type="xs:string"></xs:element>
+                                                                  </xs:sequence>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                             </xs:sequence>
+                                      </xs:complexType>
+                               </xs:element>
+                            <xs:element name="Attribute" maxOccurs="unbounded">
+                                   <xs:complexType>
+                                          <xs:sequence>
+                                                 <xs:element name="Name" type="xs:string"></xs:element>
+                                                 <xs:element name="Usage" type="xs:string"></xs:element>
+                                                 <xs:element name="Default"></xs:element>
+                                                 <xs:element name="DataType" type="xs:string"></xs:element>
+                                                 <xs:element name="Length" type="xs:int"></xs:element>
+                                                 <xs:element name="GuiLabels">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                             <xs:complexType>
+                                                                                    <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                  </xs:sequence>
+                                                               <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                               <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                             </xs:sequence>
+                                      </xs:complexType>
+                               </xs:element>
+                            <xs:element name="DynamicAttributes">
+                                   <xs:complexType>
+                                          <xs:sequence>
+                                                 <xs:element name="AttributeReference" maxOccurs="unbounded">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="ReferenceName" type="xs:string"></xs:element>
+                                                                  </xs:sequence>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                             </xs:sequence>
+                                      </xs:complexType>
+                               </xs:element>
+                            <xs:element name="TabDefinition" maxOccurs="unbounded">
+                                   <xs:complexType>
+                                          <xs:sequence>
+                                                 <xs:element name="GuiLabels">
+                                                        <xs:complexType>
+                                                               <xs:sequence>
+                                                                      <xs:element name="Label" maxOccurs="unbounded" type="xs:string">
+                                                                             <xs:complexType>
+                                                                                    <xs:attribute name="language" type="xs:string"></xs:attribute>
+                                                                                </xs:complexType>
+                                                                         </xs:element>
+                                                                  </xs:sequence>
+                                                               <xs:attribute name="guid" type="xs:string"></xs:attribute>
+                                                               <xs:attribute name="resourceId" type="xs:string"></xs:attribute>
+                                                           </xs:complexType>
+                                                    </xs:element>
+                                             </xs:sequence>
+                                          <xs:attribute name="id" type="xs:string"></xs:attribute>
+                                      </xs:complexType>
+                               </xs:element>
+                        </xs:sequence>
+                     <xs:attribute name="version" type="xs:int"></xs:attribute>
+                 </xs:complexType>
+          </xs:element>
+   </xs:schema>
