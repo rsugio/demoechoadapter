@@ -28,14 +28,14 @@ public class ResourceAdapterGenerator {
         return t;
     }
 
-    private ConfigPropertyType configPropertyType(String description, String name, String type, String value) {
+    private ConfigPropertyType configPropertyType(String name, String value) {
         ConfigPropertyType cp = new ConfigPropertyType();
         DescriptionType d = new DescriptionType();
-        d.setValue(description);
+        d.setValue(null);
         ConfigPropertyNameType cpn = new ConfigPropertyNameType();
         cpn.setValue(name);
         ConfigPropertyTypeType cpt = new ConfigPropertyTypeType();
-        cpt.setValue(type);
+        cpt.setValue("java.lang.String");
         cp.getDescription().add(d);
         cp.setConfigPropertyName(cpn);
         cp.setConfigPropertyType(cpt);
@@ -59,9 +59,9 @@ public class ResourceAdapterGenerator {
         ConnectionDefinitionType cd = new ConnectionDefinitionType();
         ora.getConnectionDefinition().add(cd);
         cd.setManagedconnectionfactoryClass(fullyQualifiedClassType(SPIManagedConnectionFactory.class.getName()));
-        ConfigPropertyType addressMode = configPropertyType(null, "addressMode", "java.lang.String", "CPA");
-        ConfigPropertyType adapterType = configPropertyType(null, "adapterType", "java.lang.String", EchoAdapterConstants.adapterType);
-        ConfigPropertyType adapterNamespace = configPropertyType(null, "adapterNamespace", "java.lang.String", EchoAdapterConstants.adapterNamespace);
+        ConfigPropertyType addressMode = configPropertyType("addressMode", "CPA");
+        ConfigPropertyType adapterType = configPropertyType("adapterType", EchoAdapterConstants.adapterType);
+        ConfigPropertyType adapterNamespace = configPropertyType("adapterNamespace", EchoAdapterConstants.adapterNamespace);
         cd.getConfigProperty().add(addressMode);
         cd.getConfigProperty().add(adapterType);
         cd.getConfigProperty().add(adapterNamespace);

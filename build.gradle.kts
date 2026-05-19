@@ -1,12 +1,16 @@
+import build.RarBuilder
+import java.net.URLClassLoader
+
 plugins {
     id("java")
 }
 val appVersion: String by project
 
 group = "demo"
-version = "0.0.1"
+version = "0.1"
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -41,7 +45,7 @@ dependencies {
 
 tasks.jar {
     // default.jar переименовывается в колхозной сборке, здесь не меняем
-    archiveFileName.set("default.jar")
+    //archiveFileName.set("default.jar")
 //    from(sourceSets.main.get().allSource) неудобно выводит
 
     from("src") {
@@ -62,3 +66,30 @@ tasks.jar {
 tasks.test {
     useJUnitPlatform()
 }
+
+tasks.register("buildRar") {
+    dependsOn(tasks.jar)
+    doLast {
+        val classesDir = getLayout().getBuildDirectory().file("classes/java/main").get().asFile
+        val constClassFile = File(classesDir, "demoecho/EchoAdapterConstants.class")
+        if (!constClassFile.exists()) {
+            throw RuntimeException("demoecho/EchoAdapterConstants.class not found! Run main project build first.")
+        }
+        val url = classesDir.toURI().toURL()
+        val result = mutableMapOf<String, String>()
+        URLClassLoader.newInstance(arrayOf(url), ClassLoader.getSystemClassLoader()).use { cl ->
+            val constClass = cl.loadClass("demoecho.EchoAdapterConstants")
+            constClass.declaredFields.forEach {field ->
+                field.isAccessible = true
+                val value = field.get(null)  // null для статических полей
+                result[field.name] = value?.toString() ?: "null"
+            }
+        }
+        val jarfile = tasks.jar.get().archiveFile.get().asFile.toPath()
+//        val jarfile = getLayout().getBuildDirectory().file("default.jar").get().asFile.toPath()
+        val target = getLayout().getBuildDirectory().asFile.get().toPath()
+        val builder = RarBuilder(version as String, result as Map<String,String>, jarfile, target)
+        builder.build()
+    }
+}
+
