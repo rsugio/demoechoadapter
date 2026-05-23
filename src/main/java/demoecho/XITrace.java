@@ -6,6 +6,7 @@ import com.sap.tc.logging.Location;
 import com.sap.tc.logging.SimpleLogger;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Objects;
 
 public class XITrace {
     private String className = null;
@@ -45,10 +46,9 @@ public class XITrace {
     }
 
     public void entering(String signature, Object[] args) {
-        if (this.location != null) {
-            this.location.entering(signature, args);
-        }
-
+        Objects.requireNonNull(this.location);
+        Objects.requireNonNull(signature);
+        this.location.entering(signature, args);
     }
 
     public void exiting(String signature) {

@@ -56,7 +56,7 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
         this.partyChangeCallBackHandler = null;
         this.mcf = null;
         String SIGNATURE = "XIConfiguration(String adapterType, String adapterNamespace)";
-        TRACE.entering("XIConfiguration(String adapterType, String adapterNamespace)", new Object[]{adapterType, adapterNamespace});
+        TRACE.entering( SIGNATURE, new Object[]{adapterType, adapterNamespace});
 
         try {
             CPAFactory cf = CPAFactory.getInstance();
@@ -173,7 +173,7 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
 
     public void init(SPIManagedConnectionFactory mcf) throws ResourceException {
         String SIGNATURE = "init(mcf)";
-        TRACE.entering("init(mcf)");
+        TRACE.entering(SIGNATURE);
 //        String dir = null;
 //        String name = null;
         this.mcf = mcf;
@@ -184,9 +184,9 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
             this.adapterRegistry = arf.getAdapterRegistry();
             this.adapterRegistry.registerAdapter(this.adapterNamespace, this.adapterType, new AdapterCapability[]{AdapterCapability.PUSH_PROCESS_STATUS}, new AdapterCallback[]{this});
         } catch (Exception e) {
-            TRACE.catching("init(mcf)", e);
+            TRACE.catching(SIGNATURE, e);
             ResourceException re = new ResourceException("XI AAM registration failed due to: " + e.getMessage());
-            TRACE.throwing("init(mcf)", re);
+            TRACE.throwing(SIGNATURE, re);
             throw re;
         }
 
@@ -196,7 +196,7 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
 
             try {
                 LinkedList allChannels = this.lookupManager.getChannelsByAdapterType(this.adapterType, this.adapterNamespace);
-                TRACE.debugT("init(mcf)", XIAdapterCategories.CONNECT_AF, "The XI AAM service returned {0} channels for adapter type {1} with namespace {2}", new Object[]{new Integer(allChannels.size()), this.adapterType, this.adapterNamespace});
+                TRACE.debugT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "The XI AAM service returned {0} channels for adapter type {1} with namespace {2}", new Object[]{allChannels.size(), this.adapterType, this.adapterNamespace});
 
                 for(int i = 0; i < allChannels.size(); ++i) {
                     Channel channel = (Channel)allChannels.get(i);
@@ -214,22 +214,22 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
 //                        name = channel.getValueAsString("fileOutPrefix");
                     }
 
-                    TRACE.infoT("init(mcf)", XIAdapterCategories.CONNECT_AF, "Channel with ID {0} for party {1} and service {2} added (direction is {3}).", new Object[]{channel.getObjectId(), channel.getParty(), channel.getService(), channel.getDirection().toString()});
+                    TRACE.infoT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "Channel with ID {0} for party {1} and service {2} added (direction is {3}).", new Object[]{channel.getObjectId(), channel.getParty(), channel.getService(), channel.getDirection().toString()});
                 }
             } catch (Exception e) {
-                TRACE.catching("init(mcf)", e);
+                TRACE.catching(SIGNATURE, e);
                 ResourceException re = new ResourceException("XI CPA lookup failed due to: " + e.getMessage());
-                TRACE.throwing("init(mcf)", re);
+                TRACE.throwing(SIGNATURE, re);
                 throw re;
             }
         }
 
-        TRACE.exiting("init(mcf)");
+        TRACE.exiting(SIGNATURE);
     }
 
     public void stop() throws ResourceException {
         String SIGNATURE = "stop()";
-        TRACE.entering("stop()");
+        TRACE.entering(SIGNATURE);
 
         try {
             try {
@@ -239,18 +239,18 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
 
                 this.partyChangeCallBackHandler.clear();
             } catch (CPAException e) {
-                TRACE.catching("stop()", e);
+                TRACE.catching(SIGNATURE, e);
             }
 
             this.adapterRegistry.unregisterAdapter(this.adapterNamespace, this.adapterType);
         } catch (Exception e) {
-            TRACE.catching("stop()", e);
+            TRACE.catching(SIGNATURE, e);
             ResourceException re = new ResourceException("XI AAM unregistration failed due to: " + e.getMessage());
-            TRACE.throwing("stop()", re);
+            TRACE.throwing(SIGNATURE, re);
             throw re;
         }
 
-        TRACE.exiting("stop()");
+        TRACE.exiting(SIGNATURE);
     }
 
     public LinkedList getCopy(Direction direction) throws ResourceException {

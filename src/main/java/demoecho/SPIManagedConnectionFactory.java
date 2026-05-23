@@ -1,60 +1,34 @@
-
 package demoecho;
 
 import com.sap.aii.af.lib.mp.module.ModuleData;
 import com.sap.aii.af.lib.mp.processor.ModuleProcessor;
 import com.sap.aii.af.lib.mp.processor.ModuleProcessorFactory;
-import com.sap.aii.af.lib.ra.cci.XIAdapterException;
 import com.sap.aii.af.lib.util.ClassUtil;
 import com.sap.aii.af.service.administration.api.cpa.CPAFactory;
 import com.sap.aii.af.service.administration.api.cpa.CPAInboundRuntimeLookupManager;
-import com.sap.aii.af.service.administration.api.monitoring.ChannelDirection;
-import com.sap.aii.af.service.administration.api.monitoring.MonitoringManager;
-import com.sap.aii.af.service.administration.api.monitoring.MonitoringManagerFactory;
-import com.sap.aii.af.service.administration.api.monitoring.ProcessContext;
-import com.sap.aii.af.service.administration.api.monitoring.ProcessContextFactory;
-import com.sap.aii.af.service.administration.api.monitoring.ProcessState;
-import com.sap.aii.af.service.cpa.Binding;
-import com.sap.aii.af.service.cpa.CPAObjectType;
-import com.sap.aii.af.service.cpa.Channel;
-import com.sap.aii.af.service.cpa.Direction;
-import com.sap.aii.af.service.cpa.NormalizationManager;
+import com.sap.aii.af.service.administration.api.monitoring.*;
+import com.sap.aii.af.service.cpa.*;
 import com.sap.aii.af.service.cpa.Party;
 import com.sap.aii.af.service.cpa.Service;
 import com.sap.aii.af.service.idmap.MessageIDMapper;
-import com.sap.aii.af.service.resource.SAPAdapterResources;
+import com.sap.aii.af.service.monitor.impl.SAPResources;
 import com.sap.engine.interfaces.connector.ManagedConnectionFactoryActivation;
-import com.sap.engine.interfaces.messaging.api.DeliverySemantics;
-import com.sap.engine.interfaces.messaging.api.Message;
-import com.sap.engine.interfaces.messaging.api.MessageDirection;
-import com.sap.engine.interfaces.messaging.api.MessageKey;
-import com.sap.engine.interfaces.messaging.api.Payload;
-import com.sap.engine.interfaces.messaging.api.PublicAPIAccessFactory;
-import com.sap.engine.interfaces.messaging.api.TextPayload;
-import com.sap.engine.interfaces.messaging.api.XMLPayload;
+import com.sap.engine.interfaces.messaging.api.*;
 import com.sap.engine.interfaces.messaging.api.auditlog.AuditAccess;
 import com.sap.engine.interfaces.messaging.api.auditlog.AuditLogStatus;
+import com.sap.engine.interfaces.messaging.api.exception.MessagingException;
 import com.sap.engine.interfaces.messaging.api.exception.RetryControlException;
 import com.sap.engine.interfaces.messaging.api.exception.RetryMode;
+import com.sap.engine.services.configuration.appconfiguration.impl.ApplicationConfigHandlerFactoryImpl;
 import com.sap.guid.GUID;
 import com.sap.transaction.TransactionTicket;
 import com.sap.transaction.TxException;
 import com.sap.transaction.TxManager;
 import com.sap.transaction.TxRollbackException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import org.apache.commons.io.IOUtils;
+
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionManager;
 import javax.resource.spi.ConnectionRequestInfo;
@@ -62,71 +36,57 @@ import javax.resource.spi.ManagedConnection;
 import javax.resource.spi.ManagedConnectionFactory;
 import javax.resource.spi.security.PasswordCredential;
 import javax.security.auth.Subject;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Serializable, Runnable, ManagedConnectionFactoryActivation {
-    static final long serialVersionUID = -2387046407149571208L;
+    static final long serialVersionUID = 12L;
     private static final XITrace TRACE = new XITrace(SPIManagedConnectionFactory.class.getName());
-    private AuditAccess audit = null;
-    private GUID mcfLocalGuid = null;
-    private Timer controlTimer = new Timer();
-    private static final int TIMER_FIRST_RUN = 120000;
-    private static final int TIMER_PERIOD = 60000;
-    private static int fileCounter = 0;
-    private static int waitTime = 5000;
-    public static final String JNDI_NAME = EchoAdapterConstants.jndi;
-    transient PrintWriter logWriter;
-    private static Object synchronizer = new Object();
-    private SAPAdapterResources msRes = null;
-    private int threadStatus = 0;
-    private static final int TH_INIT = 0;
-    private static final int TH_STARTED = 1;
-    private static final int TH_STOPPED = 2;
-    private InitialContext ctx = null;
-    private XIConfiguration xIConfiguration = null;
-    private Map managedConnections = Collections.synchronizedMap(new HashMap());
-    private transient MessageIDMapper messageIDMapper = null;
-    private transient XIMessageFactoryImpl mf = null;
-    static final String AS_ACTIVE = "active";
-    static final String AS_INACTIVE = "inactive";
-    private static final String AM_CPA = "CPA";
-    private static final String AM_MSG = "MSG";
-    private static final String ADDR_AGENCY_EAN = "009";
-    private static final String ADDR_SCHEMA_GLN = "GLN";
-    private String addressMode = null;
     private String adapterType = null;
     private String adapterNamespace = null;
+    private InitialContext _ctx = null;
+    private final Timer _controlTimer = new Timer();
+    private static final Object _synchronizer = new Object();
+    private PublicAPIAccess _publicAPIAccess = null;
+    private AuditAccess _auditAccess = null;
+    private SAPResources _msRes = null;
+    private transient MessageIDMapper _messageIDMapper = null;
+    private transient XIMessageFactoryImpl _xiMessageFactory = null;
+
+    // ===================================
+
+    private GUID mcfLocalGuid = null;
+    private static int waitTime = 5000;
+    //    public static final String JNDI_NAME = EchoAdapterConstants.jndi;
+    transient PrintWriter logWriter;
+    private int threadStatus = 0;
+    private XIConfiguration xIConfiguration = null;
+    private Map managedConnections = Collections.synchronizedMap(new HashMap());
+    private String addressMode = null;
     private int propWaitNum = 10;
     private int propWaitTime = 1000;
-    static final String OUT_DIR = "c:/temp";
-    static final String OUT_PREFIX = "sample_ra_output";
-    static final String IN_DIR = "c:/temp";
-    static final String IN_NAME = "sample_ra_input";
-    private static final String PM_TEST = "test";
-    private static final String PM_RENAME = "rename";
-    static final String FM_NEW = "new";
-    static final String FM_REPLACE = "replace";
-    private static final String QOS_EO = "EO";
-    private static final String QOS_EOIO = "EOIO";
-    private static final String QOS_BE = "BE";
-    private static final String ERR_NONE = "none";
-    private static final String ERR_ROLLBACK = "rollback";
-    static final String ASMA_NAME = "JCAChannelID";
 
     public SPIManagedConnectionFactory() throws ResourceException {
         String SIGNATURE = "SpiManagedConnectionFactory()";
-        TRACE.entering("SpiManagedConnectionFactory()");
+        TRACE.entering(SIGNATURE);
 
         try {
-            this.ctx = new InitialContext();
-            Object res = this.ctx.lookup("SAPAdapterResources");
-            this.msRes = (SAPAdapterResources)res;
-        } catch (Exception e) {
-            TRACE.catching("SpiManagedConnectionFactory()", e);
-            TRACE.errorT("SpiManagedConnectionFactory()", XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0011", "Access to XI AF MS resource failed. Adapter cannot be started.");
+            this._ctx = new InitialContext();
+            this._msRes = (SAPResources) this._ctx.lookup("SAPAdapterResources");
+        } catch (NamingException e) {
+            TRACE.catching(SIGNATURE, e);
+            TRACE.errorT(SIGNATURE, XIAdapterCategories.CONNECT_AF, SIGNATURE + " failed");
         }
 
         try {
-            synchronized(synchronizer) {
+            synchronized (_synchronizer) {
                 this.mcfLocalGuid = new GUID();
                 TRACE.infoT("SpiManagedConnectionFactory()", XIAdapterCategories.CONNECT_AF, "This SPIManagedConnectionFactory has the GUID: " + this.mcfLocalGuid.toString());
             }
@@ -138,23 +98,111 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
         TRACE.exiting("SpiManagedConnectionFactory()");
     }
 
-    private void traceSample(String someText) {
-        String SIGNATURE = "traceSample()";
-        TRACE.entering("traceSample()");
-        TRACE.entering("traceSample()", new Object[]{someText});
+    public void setAdapterNamespace(String adapterNamespace) {
+        String SIGNATURE = "setAdapterNamespace(String adapterNamespace)";
+        TRACE.entering(SIGNATURE, new Object[]{adapterNamespace});
+        this.adapterNamespace = adapterNamespace;
+//        TRACE.exiting(SIGNATURE);
+    }
+
+    public void setAdapterType(String adapterType) {
+        String SIGNATURE = "setAdapterType(String adapterType)";
+        TRACE.entering(SIGNATURE, new Object[]{adapterType});
+        this.adapterType = adapterType;
+//        TRACE.exiting(SIGNATURE);
+    }
+
+    public String getAdapterNamespace() {
+        return this.adapterNamespace;
+    }
+
+    public String getAdapterType() {
+        return this.adapterType;
+    }
+
+    public void start() {
+        String SIGNATURE = "start()";
+        TRACE.entering(SIGNATURE);
+        String controlledMcfGuid = this.getMcfLocalGuid().toHexString();
+        TRACE.infoT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "MCF with GUID {0} is started now. ({1})", new Object[]{controlledMcfGuid, SPIManagedConnectionFactory.class.getClassLoader()});
 
         try {
-            XIAdapterException te = new XIAdapterException("Test exception only");
-            TRACE.throwing("traceSample()", te);
-            throw te;
+            this._publicAPIAccess = PublicAPIAccessFactory.getPublicAPIAccess();
+            this._auditAccess = _publicAPIAccess.getAuditAccess();
+        } catch (MessagingException e) {
+            TRACE.catching(SIGNATURE, e);
+            TRACE.errorT(SIGNATURE, XIAdapterCategories.CONNECT, "SOA.apt_sample.0035", "Unable to access the XI AF audit log. Reason: {0}. Adapter cannot not start the inbound processing!", e);
+            TRACE.exiting(SIGNATURE);
+            return;
+        }
+
+        try {
+            this._xiMessageFactory = new XIMessageFactoryImpl(this.adapterType, this.adapterNamespace);
         } catch (Exception e) {
-            TRACE.catching("traceSample()", e);
-            TRACE.debugT("traceSample()", "A test TraceException was catched and ignored!");
-            TRACE.exiting("traceSample()");
-            TRACE.exiting("traceSample()", "some return value");
+            TRACE.catching(SIGNATURE, e);
+            TRACE.errorT(SIGNATURE, XIAdapterCategories.CONNECT, "SOA.apt_sample.0037", "Unable to create XI message factory. Adapter cannot not start the inbound processing!");
+            TRACE.exiting(SIGNATURE);
+            return;
+        }
+        try {
+            this.startMCF();
+            this.startTimer();
+            TRACE.infoT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "MCF with GUID {0} was started successfully.", new Object[]{controlledMcfGuid});
+        } catch (Exception e) {
+            TRACE.catching(SIGNATURE, e);
+            TRACE.errorT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0038", "Start of MCF failed. Reason: {0}", e.getMessage());
+        }
+        this._messageIDMapper = MessageIDMapper.getInstance();
+        if (this._messageIDMapper == null) {
+            TRACE.errorT(SIGNATURE, XIAdapterCategories.CONNECT, "SOA.apt_sample.0036", "Gut null as MessageIDMapper singleton instance. Adapter cannot start the inbound processing!");
+            TRACE.exiting(SIGNATURE);
+        } else {
+//            try {
+//                ClassUtil.setClassLoader("com.sap.aii.af.sample.module.ConvertCRLFfromToLF0", ConvertCRLFfromToLF0.class.getClassLoader());
+//            } catch (Exception e) {
+//                TRACE.catching(SIGNATURE, e);
+//                TRACE.errorT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0039", "Unable to register pojo modules. Reason: {0}", e.getMessage());
+//            }
+
+            TRACE.exiting(SIGNATURE);
         }
     }
 
+    private void _init(String SIGNATURE) throws IOException, NamingException {
+        Objects.requireNonNull(this._ctx);
+        ApplicationConfigHandlerFactoryImpl appCfgProps = (ApplicationConfigHandlerFactoryImpl) this._ctx.lookup("ApplicationConfiguration");
+        Properties appProps = appCfgProps.getApplicationProperties();
+        Properties systemProfile = appCfgProps.getSystemProfile();
+        TRACE.infoT(SIGNATURE, "ApplicationConfiguration={0}, appProps={1}, systemProfile={2}", new Object[]{appCfgProps, appProps, systemProfile});
+        String centralLogDirectory = "/var/tmp/" + EchoAdapterConstants.adapterType;
+        if (appProps != null) {
+            centralLogDirectory = appProps.getProperty("centralFileLogDirectory");
+        } else if (systemProfile != null && systemProfile.containsKey("com.sap.systemdir")) {
+            // /usr/sap/JX1/SYS/global
+            centralLogDirectory = systemProfile.getProperty("com.sap.systemdir") + "/xi_customer_logs/adapter_" + EchoAdapterConstants.adapterType;
+        }
+        Path centralFileLogDirectory = Paths.get(centralLogDirectory);
+        if (!Files.isDirectory(centralFileLogDirectory)) {
+            Files.createDirectories(centralFileLogDirectory);
+            Files.setPosixFilePermissions(centralFileLogDirectory, PosixFilePermissions.fromString("rwxrwxr-x"));
+        }
+        // https://help.sap.com/docs/SAP_NETWEAVER_750/5bdacafd0bbd41648f4b80093a1bf9d6/4b1e4ff438294ba2e10000000a42189c.html
+        Properties systemProps = appCfgProps.getSystemProfile();
+        Path echoAdapterLog = centralFileLogDirectory.resolve("echoadapter.log");
+        if (!Files.isRegularFile(echoAdapterLog)) {
+            Files.createFile(echoAdapterLog);
+            Files.setPosixFilePermissions(echoAdapterLog, PosixFilePermissions.fromString("rwxrwxr-x"));
+        }
+        String startLog = EchoAdapterConstants.kolhoz + "\n\n" + SIGNATURE + " " + LocalDateTime.now() +
+                "\n\tappProps=" + appProps +
+                "\n\tsystemProps=" + systemProps + "\n";
+        IOUtils.write(startLog, Files.newOutputStream(echoAdapterLog), StandardCharsets.UTF_8);
+        IOUtils.write(startLog, Files.newOutputStream(echoAdapterLog, StandardOpenOption.APPEND), StandardCharsets.UTF_8);
+
+    }
+
+
+    // ---------------------------------------------------------------------------------------------
     private ModuleProcessor lookUpModuleProcessor(int retryNum) throws ResourceException {
         String SIGNATURE = "lookUpModuleProcessor()";
         TRACE.entering("lookUpModuleProcessor()");
@@ -185,7 +233,7 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
     public Object createConnectionFactory() throws ResourceException {
         String SIGNATURE = "createConnectionFactory()";
         TRACE.entering("createConnectionFactory()");
-        CCIConnectionFactory factory = new CCIConnectionFactory(this, (ConnectionManager)null);
+        CCIConnectionFactory factory = new CCIConnectionFactory(this, (ConnectionManager) null);
         TRACE.exiting("createConnectionFactory()");
         return factory;
     }
@@ -203,8 +251,8 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
             throw re;
         } else {
             try {
-                channelID = ((CCIConnectionRequestInfo)info).getChannelId();
-                channel = (Channel)CPAFactory.getInstance().getLookupManager().getCPAObject(CPAObjectType.CHANNEL, channelID);
+                channelID = ((CCIConnectionRequestInfo) info).getChannelId();
+                channel = (Channel) CPAFactory.getInstance().getLookupManager().getCPAObject(CPAObjectType.CHANNEL, channelID);
             } catch (Exception e) {
                 TRACE.catching("createManagedConnection(Subject subject, ConnectionRequestInfo info)", e);
                 TRACE.errorT("createManagedConnection(Subject subject, ConnectionRequestInfo info)", XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0014", "Cannot access the channel parameters of channel: " + channelID + ". Check whether the channel is stopped in the administrator console.");
@@ -230,9 +278,9 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
         SPIManagedConnection mc = null;
 
         try {
-            mc = (SPIManagedConnection)this.managedConnections.get(channelID);
+            mc = (SPIManagedConnection) this.managedConnections.get(channelID);
             if (mc != null) {
-                mc.sendEvent(1, (Exception)null, mc);
+                mc.sendEvent(1, (Exception) null, mc);
                 this.managedConnections.remove(channelID);
                 mc.destroy(true);
                 TRACE.debugT("destroyManagedConnection(String channelID)", XIAdapterCategories.CONNECT_AF, "ManagedConnection for channel ID {0} found and destroyed.", new Object[]{channelID});
@@ -264,13 +312,13 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
             TRACE.errorT("matchManagedConnections(Set connectionSet, Subject subject, ConnectionRequestInfo info)", XIAdapterCategories.CONNECT_AF, "Unknown ConnectionRequestInfo parameter received. Cannot match connection");
             return null;
         } else {
-            cciInfo = (CCIConnectionRequestInfo)info;
+            cciInfo = (CCIConnectionRequestInfo) info;
             Iterator it = connectionSet.iterator();
 
-            while(it.hasNext() && mcFound == null) {
+            while (it.hasNext() && mcFound == null) {
                 Object obj = it.next();
                 if (obj instanceof SPIManagedConnection) {
-                    SPIManagedConnection mc = (SPIManagedConnection)obj;
+                    SPIManagedConnection mc = (SPIManagedConnection) obj;
                     if (!mc.isDestroyed()) {
                         ManagedConnectionFactory mcf = mc.getManagedConnectionFactory();
                         mcFound = mc;
@@ -301,34 +349,18 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
     }
 
     public AuditAccess getAuditAccess() {
-        return this.audit;
+        return this._auditAccess;
     }
 
     public XIMessageFactoryImpl getXIMessageFactoryImpl() {
-        return this.mf;
-    }
-
-    public String getOutFileName(String outFileNamePrefix) {
-        String SIGNATURE = "getFileName()";
-        TRACE.entering("getFileName()");
-        int cnt = 0;
-        String fileName = null;
-        synchronized(synchronizer) {
-            cnt = fileCounter++;
-        }
-
-        fileName = new String(outFileNamePrefix + "." + Integer.toString(cnt) + ".txt");
-        TRACE.debugT("getFileName()", XIAdapterCategories.CONNECT, "Output file name =" + fileName);
-        TRACE.exiting("getFileName()");
-        return fileName;
+        return this._xiMessageFactory;
     }
 
     public boolean equals(Object obj) {
-        String SIGNATURE = "equals(Object obj)";
         TRACE.entering("equals(Object obj)", new Object[]{obj});
         boolean equal = false;
         if (obj instanceof SPIManagedConnectionFactory) {
-            SPIManagedConnectionFactory other = (SPIManagedConnectionFactory)obj;
+            SPIManagedConnectionFactory other = (SPIManagedConnectionFactory) obj;
             if (this.adapterNamespace.equals(other.getAdapterNamespace()) && this.adapterType.equals(other.getAdapterType()) && this.addressMode.equals(other.getAddressMode())) {
                 equal = true;
             }
@@ -348,10 +380,6 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
         return hash;
     }
 
-    public static int getFileCounter() {
-        return fileCounter;
-    }
-
     public String getAddressMode() {
         String SIGNATURE = "getAddressMode()";
         TRACE.entering("getAddressMode()");
@@ -366,22 +394,23 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
 
     public void startMCF() throws ResourceException {
         String SIGNATURE = "startMCF()";
-        TRACE.entering("startMCF()");
+        TRACE.entering(SIGNATURE);
         if (this.threadStatus != 1) {
             try {
+                _init(SIGNATURE);
                 this.threadStatus = 1;
-                this.msRes.startRunnable(this);
+                this._msRes.startRunnable(this);
             } catch (Exception e) {
-                TRACE.catching("startMCF()", e);
+                TRACE.catching(SIGNATURE, e);
                 this.threadStatus = 2;
-                TRACE.errorT("startMCF()", XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0016", "Cannot start inbound message thread");
+                TRACE.errorT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0016", "Cannot start inbound message thread");
                 ResourceException re = new ResourceException(e.getMessage());
-                TRACE.throwing("startMCF()", re);
+                TRACE.throwing(SIGNATURE, re);
                 throw re;
             }
         }
 
-        TRACE.exiting("startMCF()");
+        TRACE.exiting(SIGNATURE);
     }
 
     public void stopMCF() throws ResourceException {
@@ -390,9 +419,9 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
         this.threadStatus = 2;
 
         try {
-            synchronized(this) {
+            synchronized (this) {
                 this.notify();
-                this.wait((long)(waitTime + 1000));
+                this.wait((long) (waitTime + 1000));
             }
 
             this.xIConfiguration.stop();
@@ -409,23 +438,23 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
 
     public void startTimer() {
         String SIGNATURE = "startTimer()";
-        TRACE.entering("startTimer()");
+        TRACE.entering(SIGNATURE);
         if (this.mcfLocalGuid != null) {
             try {
-                this.controlTimer.scheduleAtFixedRate(new XIManagedConnectionFactoryController(this, this.ctx), 120000L, 60000L);
+                this._controlTimer.scheduleAtFixedRate(new XIManagedConnectionFactoryController(this, this._ctx), 120000L, 60000L);
             } catch (Exception e) {
-                TRACE.catching("startTimer()", e);
-                TRACE.debugT("startTimer()", XIAdapterCategories.CONNECT_AF, "Creation of MCF controller failed. No periodic MCF status reports available! Reason: " + e.getMessage());
+                TRACE.catching(SIGNATURE, e);
+                TRACE.debugT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "Creation of MCF controller failed. No periodic MCF status reports available! Reason: " + e.getMessage());
             }
         }
 
-        TRACE.exiting("startTimer()");
+        TRACE.exiting(SIGNATURE);
     }
 
     public void stopTimer() {
         String SIGNATURE = "stopTimer()";
         TRACE.entering("stopTimer()");
-        this.controlTimer.cancel();
+        this._controlTimer.cancel();
         TRACE.exiting("stopTimer()");
     }
 
@@ -442,7 +471,7 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
             int numTry = 0;
             int pollTime = -1;
 
-            while(notSet && numTry < this.propWaitNum) {
+            while (notSet && numTry < this.propWaitNum) {
                 if (this.addressMode != null && this.adapterType != null && this.adapterNamespace != null) {
                     notSet = false;
                 }
@@ -451,7 +480,7 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
                 TRACE.debugT("run()", XIAdapterCategories.CONNECT_AF, "MCF waits for setter completion. Try: {0} of {1}.", new Object[]{Integer.toString(numTry), Integer.toString(this.propWaitNum)});
 
                 try {
-                    Thread.sleep((long)this.propWaitTime);
+                    Thread.sleep((long) this.propWaitTime);
                 } catch (Exception e) {
                     TRACE.catching("run()", e);
                 }
@@ -490,12 +519,12 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
                 }
             }
 
-            while(this.threadStatus == 1) {
+            while (this.threadStatus == 1) {
                 try {
                     LinkedList channels = this.xIConfiguration.getCopy(Direction.INBOUND);
 
-                    for(int i = 0; i < channels.size(); ++i) {
-                        Channel channel = (Channel)channels.get(i);
+                    for (int i = 0; i < channels.size(); ++i) {
+                        Channel channel = (Channel) channels.get(i);
 
                         try {
                             String directory = null;
@@ -621,11 +650,11 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
                 }
 
                 try {
-                    synchronized(this) {
+                    synchronized (this) {
                         if (pollTime <= 0) {
-                            this.wait((long)waitTime);
+                            this.wait((long) waitTime);
                         } else {
-                            this.wait((long)pollTime);
+                            this.wait((long) pollTime);
                         }
                     }
                 } catch (InterruptedException e1) {
@@ -674,11 +703,11 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
         String extMsgId = getExternalMessageID(inputFile);
         TRACE.infoT("sendMessageFromFile(String inFileName)", "External message ID is '" + extMsgId + "'");
         if (fileRead && 0 != processMode.compareToIgnoreCase("test") && (qos.equalsIgnoreCase("EOIO") || qos.equalsIgnoreCase("EO"))) {
-            if ((xiMsgId = this.messageIDMapper.getMappedId(extMsgId)) != null) {
+            if ((xiMsgId = this._messageIDMapper.getMappedId(extMsgId)) != null) {
                 TRACE.infoT("sendMessageFromFile(String inFileName)", XIAdapterCategories.CONNECT_AF, "Duplicated and already processed file (message) with id {0} detected.  It will be ignored.", new Object[]{extMsgId});
                 MessageKey amk = new MessageKey(xiMsgId, MessageDirection.OUTBOUND);
-                this.audit.addAuditLogEntry(amk, AuditLogStatus.SUCCESS, "Duplicated and already processed file (message) with id {0} detected.  It will be ignored.", new Object[]{extMsgId});
-                this.audit.flushAuditLogEntries(amk);
+                this._auditAccess.addAuditLogEntry(amk, AuditLogStatus.SUCCESS, "Duplicated and already processed file (message) with id {0} detected.  It will be ignored.", new Object[]{extMsgId});
+                this._auditAccess.flushAuditLogEntries(amk);
                 if (0 == processMode.compareToIgnoreCase("rename")) {
                     try {
                         this.renameFile(inFileName, inputFile);
@@ -699,7 +728,7 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
                 BufferedReader in = new BufferedReader(new FileReader(inputFile));
 
                 String line;
-                for(line = null; (line = in.readLine()) != null; msgText = msgText + line + "\n") {
+                for (line = null; (line = in.readLine()) != null; msgText = msgText + line + "\n") {
                 }
 
                 in.close();
@@ -809,7 +838,7 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
 
                 TRACE.debugT("sendMessageFromFile(String inFileName)", XIAdapterCategories.CONNECT_AF, "The following address data were extracted (FP,TP,FS,TS,A): " + fromParty + "," + toParty + "," + fromService + "," + toService + "," + action);
                 TRACE.debugT("sendMessageFromFile(String inFileName)", XIAdapterCategories.CONNECT_AF, "The channel ID is: " + channelId);
-                Message msg = this.mf.createMessageRecord(fromParty, toParty, fromService, toService, action, actionNS);
+                Message msg = this._xiMessageFactory.createMessageRecord(fromParty, toParty, fromService, toService, action, actionNS);
                 if (qos.equalsIgnoreCase("BE")) {
                     msg.setDeliverySemantics(DeliverySemantics.BestEffort);
                 } else if (qos.equalsIgnoreCase("EOIO")) {
@@ -871,21 +900,21 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
                         }
 
                         TRACE.debugT("sendMessageFromFile(String inFileName)", XIAdapterCategories.CONNECT_AF, "The last audit message key being used was: amk: {0}, dir: {1}, msgid: {2}, msgkey: {3}, stat: {4}.", new Object[]{amk.toString(), amk.getDirection().toString(), amk.getMessageId().toString(), amk.toString(), AuditLogStatus.SUCCESS.toString()});
-                        this.audit.addAuditLogEntry(amk, AuditLogStatus.SUCCESS, "Asynchronous message was read from file and will be forwarded to the XI AF MS now.");
-                        this.audit.addAuditLogEntry(amk, AuditLogStatus.SUCCESS, "Name of the processed file: {0}.", new Object[]{inFileName});
-                        this.audit.addAuditLogEntry(amk, AuditLogStatus.WARNING, "Demo: This is a warning audit log message");
-                        this.audit.flushAuditLogEntries(amk);
-                        this.audit.flushAuditLogEntries(amk);
+                        this._auditAccess.addAuditLogEntry(amk, AuditLogStatus.SUCCESS, "Asynchronous message was read from file and will be forwarded to the XI AF MS now.");
+                        this._auditAccess.addAuditLogEntry(amk, AuditLogStatus.SUCCESS, "Name of the processed file: {0}.", new Object[]{inFileName});
+                        this._auditAccess.addAuditLogEntry(amk, AuditLogStatus.WARNING, "Demo: This is a warning audit log message");
+                        this._auditAccess.flushAuditLogEntries(amk);
+                        this._auditAccess.flushAuditLogEntries(amk);
                         TRACE.debugT("sendMessageFromFile(String inFileName)", XIAdapterCategories.CONNECT_AF, "Message will be forwarded to XI AF MP and channel: " + channelId);
                         this.lookUpModuleProcessor(1).process(channelId, md);
                         TRACE.debugT("sendMessageFromFile(String inFileName)", XIAdapterCategories.CONNECT_AF, "The message with ID " + msg.getMessageId() + " was forwarded to the XI AF succesfully.");
                         if (0 != processMode.compareToIgnoreCase("test")) {
-                            this.messageIDMapper.createIDMap(extMsgId, xiMsgId, System.currentTimeMillis() + 86400000L, true);
+                            this._messageIDMapper.createIDMap(extMsgId, xiMsgId, System.currentTimeMillis() + 86400000L, true);
                         }
 
                         if (0 == raiseError.compareToIgnoreCase("rollback")) {
-                            this.audit.addAuditLogEntry(amk, AuditLogStatus.ERROR, "Channel error mode is set to rollback. An Exception is thrown now to demonstrate a rollback behavior.");
-                            this.audit.flushAuditLogEntries(amk);
+                            this._auditAccess.addAuditLogEntry(amk, AuditLogStatus.ERROR, "Channel error mode is set to rollback. An Exception is thrown now to demonstrate a rollback behavior.");
+                            this._auditAccess.flushAuditLogEntries(amk);
                             TRACE.infoT("sendMessageFromFile(String inFileName)", XIAdapterCategories.CONNECT_AF, "Channel error mode is set to rollback. An Exception is thrown now to demonstrate a rollback behavior.");
 
                             try {
@@ -937,17 +966,17 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
                         xiMsgId = msg.getMessageId();
                         MessageKey amk = new MessageKey(xiMsgId, MessageDirection.OUTBOUND);
                         md.setSupplementalData("audit.key", amk);
-                        this.audit.addAuditLogEntry(amk, AuditLogStatus.SUCCESS, "Synchronous message was read from file and will be forwarded to the XI AF MS now.");
+                        this._auditAccess.addAuditLogEntry(amk, AuditLogStatus.SUCCESS, "Synchronous message was read from file and will be forwarded to the XI AF MS now.");
                         TRACE.debugT("sendMessageFromFile(String inFileName)", XIAdapterCategories.CONNECT_AF, "Message will be forwarded to XI AF MP and channel: " + channelId);
                         ModuleData result = this.lookUpModuleProcessor(1).process(channelId, md);
                         TRACE.debugT("sendMessageFromFile(String inFileName)", XIAdapterCategories.CONNECT_AF, "The synchronous message with ID " + msg.getMessageId() + " was processed by the XI AF succesfully.");
                         Object principal = result.getPrincipalData();
                         if (principal instanceof Message) {
-                            Message response = (Message)principal;
+                            Message response = (Message) principal;
                             TRACE.infoT("sendMessageFromFile(String inFileName)", XIAdapterCategories.CONNECT_AF, "Got back a response message. ID/FP/FS/TP/TS/IF/IFNS/Class: {0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}", new Object[]{response.getMessageId(), response.getFromParty().toString(), response.getFromService().toString(), response.getToParty().toString(), response.getToService().toString(), response.getAction().getName(), response.getAction().getType(), response.getMessageClass().toString()});
                             Payload payload = response.getDocument();
                             if (payload instanceof TextPayload) {
-                                TextPayload text = (TextPayload)payload;
+                                TextPayload text = (TextPayload) payload;
                                 TRACE.infoT("sendMessageFromFile(String inFileName)", XIAdapterCategories.CONNECT_AF, "Payload: {0}", new Object[]{text.getText()});
                             } else {
                                 TRACE.infoT("sendMessageFromFile(String inFileName)", XIAdapterCategories.CONNECT_AF, "Received a binary response {0}", new Object[]{new String(payload.getContent())});
@@ -955,7 +984,7 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
 
                             Payload att = response.getAttachment("Attachment");
                             if (att != null & att instanceof TextPayload) {
-                                TextPayload text = (TextPayload)att;
+                                TextPayload text = (TextPayload) att;
                                 TRACE.infoT("sendMessageFromFile(String inFileName)", XIAdapterCategories.CONNECT_AF, "Payload: {0}", new Object[]{text.getText()});
                             } else if (att != null) {
                                 TRACE.infoT("sendMessageFromFile(String inFileName)", XIAdapterCategories.CONNECT_AF, "Received a binary response {0}", new Object[]{new String(att.getContent())});
@@ -1015,82 +1044,9 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
         }
     }
 
-    public String getAdapterNamespace() {
-        String SIGNATURE = "getAdapterNamespace()";
-        TRACE.entering("getAdapterNamespace()");
-        TRACE.exiting("getAdapterNamespace()");
-        return this.adapterNamespace;
-    }
-
-    public String getAdapterType() {
-        return this.adapterType;
-    }
-
-    public void setAdapterNamespace(String adapterNamespace) {
-        String SIGNATURE = "setAdapterNamespace(String adapterNamespace)";
-        TRACE.entering("setAdapterNamespace(String adapterNamespace)", new Object[]{adapterNamespace});
-        this.adapterNamespace = adapterNamespace;
-        TRACE.exiting("setAdapterNamespace(String adapterNamespace)");
-    }
-
-    public void setAdapterType(String adapterType) {
-        String SIGNATURE = "setAdapterType(String adapterType)";
-        TRACE.entering("setAdapterType(String adapterType)", new Object[]{adapterType});
-        this.adapterType = adapterType;
-        TRACE.exiting("setAdapterType(String adapterType)");
-    }
 
     public GUID getMcfLocalGuid() {
         return this.mcfLocalGuid;
-    }
-
-    public void start() {
-        String SIGNATURE = "start()";
-        TRACE.entering("start()");
-        String controlledMcfGuid = this.getMcfLocalGuid().toHexString();
-        TRACE.infoT("start()", XIAdapterCategories.CONNECT_AF, "MCF with GUID {0} is started now. ({1})", new Object[]{controlledMcfGuid.toString(), SPIManagedConnectionFactory.class.getClassLoader()});
-
-        try {
-            this.audit = PublicAPIAccessFactory.getPublicAPIAccess().getAuditAccess();
-        } catch (Exception e) {
-            TRACE.catching("start()", e);
-            TRACE.errorT("start()", XIAdapterCategories.CONNECT, "SOA.apt_sample.0035", "Unable to access the XI AF audit log. Reason: {0}. Adapter cannot not start the inbound processing!", new Object[]{e});
-            TRACE.exiting("start()");
-            return;
-        }
-
-        this.messageIDMapper = MessageIDMapper.getInstance();
-        if (this.messageIDMapper == null) {
-            TRACE.errorT("start()", XIAdapterCategories.CONNECT, "SOA.apt_sample.0036", "Gut null as MessageIDMapper singleton instance. Adapter cannot not start the inbound processing!");
-            TRACE.exiting("start()");
-        } else {
-            try {
-                this.mf = new XIMessageFactoryImpl(this.adapterType, this.adapterNamespace);
-            } catch (Exception e) {
-                TRACE.catching("start()", e);
-                TRACE.errorT("start()", XIAdapterCategories.CONNECT, "SOA.apt_sample.0037", "Unable to create XI message factory. Adapter cannot not start the inbound processing!");
-                TRACE.exiting("start()");
-                return;
-            }
-
-            try {
-                this.startMCF();
-                this.startTimer();
-                TRACE.infoT("start()", XIAdapterCategories.CONNECT_AF, "MCF with GUID {0} was started successfully.", new Object[]{controlledMcfGuid.toString()});
-            } catch (Exception e) {
-                TRACE.catching("start()", e);
-                TRACE.errorT("start()", XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0038", "Start of MCF failed. Reason: {0}", new Object[]{e.getMessage()});
-            }
-
-            try {
-                ClassUtil.setClassLoader("com.sap.aii.af.sample.module.ConvertCRLFfromToLF0", ConvertCRLFfromToLF0.class.getClassLoader());
-            } catch (Exception e) {
-                TRACE.catching("start()", e);
-                TRACE.errorT("start()", XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0039", "Unable to register pojo modules. Reason: {0}", new Object[]{e.getMessage()});
-            }
-
-            TRACE.exiting("start()");
-        }
     }
 
     public void stop() {
@@ -1131,10 +1087,10 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
                     controlledMcfGuid = this.controlledMcf.getMcfLocalGuid().toHexString();
                 }
 
-                SPIManagedConnectionFactory.TRACE.debugT("XIManagedConnectionFactoryController.run()", XIAdapterCategories.CONNECT_AF, "MCF with GUID {0} is running. ({1})", new Object[]{controlledMcfGuid.toString(), SPIManagedConnectionFactory.class.getClassLoader()});
+                SPIManagedConnectionFactory.TRACE.debugT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "MCF with GUID {0} is running. ({1})", new Object[]{controlledMcfGuid.toString(), SPIManagedConnectionFactory.class.getClassLoader()});
             } catch (Exception e) {
-                SPIManagedConnectionFactory.TRACE.catching("XIManagedConnectionFactoryController.run()", e);
-                SPIManagedConnectionFactory.TRACE.warningT("XIManagedConnectionFactoryController.run()", XIAdapterCategories.CONNECT_AF, "Processing of control timer failed. Reason: " + e.getMessage());
+                SPIManagedConnectionFactory.TRACE.catching(SIGNATURE, e);
+                SPIManagedConnectionFactory.TRACE.warningT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "Processing of control timer failed. Reason: " + e.getMessage());
             }
 
         }

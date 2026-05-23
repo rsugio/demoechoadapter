@@ -1,5 +1,4 @@
-import build.RarBuilder
-import java.net.URLClassLoader
+import build.RarSdaBuilder
 
 plugins {
     id("java")
@@ -22,19 +21,21 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+val libsDirName = "libs"
 dependencies {
     implementation(
         fileTree(
             mapOf(
-                "dir" to "libs",
-                "include" to listOf("*.jar")
+                "dir" to libsDirName, "include" to listOf("*.jar")
             )
         )
     )
-//    implementation("com.google.code.gson:gson:2.13.2")
-    testImplementation("commons-io:commons-io:2.22.0")
-    //implementation("javax.resource:javax.resource-api:1.7.0")
-//    implementation("javax.resource:connector-api:1.5")
+//    implementation("commons-io:commons-io:2.22.0")
+//    implementation("org.apache.commons:commons-lang3:3.20.0")
+    implementation("com.google.code.gson:gson:2.13.2")
+    //implementation("javax.resource:connector-api:1.5")    // см.connector.jar из ./libs
+
+    //testImplementation("javax.resource:javax.resource-api:1.7.0")
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -44,8 +45,6 @@ dependencies {
 }
 
 tasks.jar {
-    // default.jar переименовывается в колхозной сборке, здесь не меняем
-    //archiveFileName.set("default.jar")
 //    from(sourceSets.main.get().allSource) неудобно выводит
 
     from("src") {
@@ -59,7 +58,7 @@ tasks.jar {
         into("src")
     }
     manifest {
-        attributes["Implementation-Version"] = "7.654321"
+        // attributes["Implementation-Version"] = "7.654321"
     }
 }
 
@@ -70,25 +69,15 @@ tasks.test {
 tasks.register("buildRar") {
     dependsOn(tasks.jar)
     doLast {
-        val classesDir = getLayout().getBuildDirectory().file("classes/java/main").get().asFile
-        val constClassFile = File(classesDir, "demoecho/EchoAdapterConstants.class")
-        if (!constClassFile.exists()) {
-            throw RuntimeException("demoecho/EchoAdapterConstants.class not found! Run main project build first.")
-        }
-        val url = classesDir.toURI().toURL()
-        val result = mutableMapOf<String, String>()
-        URLClassLoader.newInstance(arrayOf(url), ClassLoader.getSystemClassLoader()).use { cl ->
-            val constClass = cl.loadClass("demoecho.EchoAdapterConstants")
-            constClass.declaredFields.forEach {field ->
-                field.isAccessible = true
-                val value = field.get(null)  // null для статических полей
-                result[field.name] = value?.toString() ?: "null"
-            }
-        }
-        val jarfile = tasks.jar.get().archiveFile.get().asFile.toPath()
-//        val jarfile = getLayout().getBuildDirectory().file("default.jar").get().asFile.toPath()
+        val constClassName = "demoecho.EchoAdapterConstants"
+        val srcDir = layout.projectDirectory.file("src").asFile.toPath()
+        val libsdir = layout.projectDirectory.file(libsDirName).asFile.toPath()
         val target = getLayout().getBuildDirectory().asFile.get().toPath()
-        val builder = RarBuilder(version as String, result as Map<String,String>, jarfile, target)
+        val jarfile = tasks.jar.get().archiveFile.get().asFile.toPath()
+        // чтобы загрузить константы в сборщике, нужен класслоадер со всеми библиотеками, важно libsDirName
+        val builder = RarSdaBuilder(
+            version as String, constClassName, srcDir, jarfile, libsdir, target
+        )
         builder.build()
     }
 }

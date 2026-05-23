@@ -36,7 +36,7 @@ public class SPIManagedConnection implements ManagedConnection {
 
     SPIManagedConnection(SPIManagedConnectionFactory mcf, PasswordCredential credential, boolean supportsLocalTx, String channelID, Channel channel) throws ResourceException, NotSupportedException {
         String SIGNATURE = "SpiManagedConnection(ManagedConnectionFactory mcf, PasswordCredential credential, boolean supportsLocalTx, String channelID)";
-        TRACE.entering("SpiManagedConnection(ManagedConnectionFactory mcf, PasswordCredential credential, boolean supportsLocalTx, String channelID)", new Object[]{mcf, credential, new Boolean(supportsLocalTx), channelID});
+        TRACE.entering(SIGNATURE, new Object[]{mcf, credential, supportsLocalTx, channelID});
 //        String outFileName = "(not set)";
 //        String privKeyView = null;
 //        String privKeyAlias = null;
@@ -82,7 +82,7 @@ public class SPIManagedConnection implements ManagedConnection {
 //            }
 //
 //            this.outFileNamePrefix = new String(this.directory + "/" + this.prefix);
-            TRACE.debugT("SpiManagedConnection(ManagedConnectionFactory mcf, PasswordCredential credential, boolean supportsLocalTx, String channelID)", XIAdapterCategories.CONNECT_AF, "//TODO delete loc:93");
+            TRACE.debugT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "//TODO delete loc:93");
 
 //            try {
 //                privKeyView = channel.getValueAsString("secViewPrivateKey");
@@ -118,7 +118,7 @@ public class SPIManagedConnection implements ManagedConnection {
 //                throw new ResourceException(e.getMessage());
 //            }
 
-            TRACE.exiting("SpiManagedConnection(ManagedConnectionFactory mcf, PasswordCredential credential, boolean supportsLocalTx, String channelID)");
+            TRACE.exiting(SIGNATURE);
         }
     }
 
@@ -144,24 +144,24 @@ public class SPIManagedConnection implements ManagedConnection {
 
     public Object getConnection(Subject subject, ConnectionRequestInfo info) throws ResourceException {
         String SIGNATURE = "getConnection(Subject subject, ConnectionRequestInfo info)";
-        TRACE.entering("getConnection(Subject subject, ConnectionRequestInfo info)", new Object[]{subject, info});
+        TRACE.entering(SIGNATURE, new Object[]{subject, info});
         this.checkIfDestroyed();
         CCIConnection cciConnection = new CCIConnection(this);
         this.addCciConnection(cciConnection);
-        TRACE.exiting("getConnection(Subject subject, ConnectionRequestInfo info)");
+        TRACE.exiting(SIGNATURE);
         return cciConnection;
     }
 
     public void destroy() throws ResourceException {
         String SIGNATURE = "destroy()";
-        TRACE.entering("destroy()");
+        TRACE.entering(SIGNATURE);
         this.destroy(false);
-        TRACE.exiting("destroy()");
+        TRACE.exiting(SIGNATURE);
     }
 
     void destroy(boolean fromMCF) throws ResourceException {
         String SIGNATURE = "destroy(boolean fromMCF)";
-        TRACE.entering("destroy(boolean fromMCF)", new Object[]{new Boolean(fromMCF)});
+        TRACE.entering(SIGNATURE, new Object[]{fromMCF});
         if (!this.destroyed) {
             try {
                 this.destroyed = true;
