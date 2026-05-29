@@ -21,9 +21,12 @@ public class EchoAdapterConstants {
     public final static String raEis = "Без EIS (локальная обработка)";
     public final static String swcName = "ZRSUGIO";
 
-    // имена Development-компонент
+    // имена Development-компонент и context-root
     public final static String dcNameRA = raShortName + ".ra";
     public static final String dcNameLib = raShortName + ".lib";
+    public static final String dcNameWeb = raShortName + ".web";
+    // http://localhost:50000/rsug.io~demoecho
+    public static final String webContextRoot = adapterVendor + "~demoecho";
 
     // полный JNDI
     public final static String jndi = "deployedAdapters/" + dcNameRA + "/shareable/" + dcNameRA;
@@ -46,6 +49,8 @@ public class EchoAdapterConstants {
         props.put("swcName", swcName);
         props.put("dcNameRA", dcNameRA);
         props.put("dcNameLib", dcNameLib);
+        props.put("dcNameWeb", dcNameWeb);
+        props.put("webContextRoot", webContextRoot);
 
         Path whereTo = Paths.get("properties.xml");
         String comment = String.format("Константы для сборки адаптера %s из файла %s", adapterType, EchoAdapterConstants.class.getName());

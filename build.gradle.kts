@@ -6,7 +6,19 @@ plugins {
 }
 
 group = "demo"
-version = "1"
+
+val propertiesXmlFile = file("properties.xml")
+if (!propertiesXmlFile.exists())
+    error("properties.xml not found, please run EchoAdapterConstants.main() manually before")
+else
+    println("properties.xml is good")
+val configProps = Properties().apply {
+    FileInputStream(propertiesXmlFile).use { inputStream ->
+        loadFromXML(inputStream)
+    }
+}
+val adapterVendor = configProps["adapterVendor"]
+version = configProps["adapterVersion"].toString() // версия должна быть числом, /AdapterTypeMetaData/@version это xs:integer
 
 repositories {
     mavenLocal()
@@ -26,29 +38,7 @@ dependencies {
             )
         )
     )
-//    implementation("javax.xml.bind:jaxb-api:2.3.1")
-//    implementation("com.sun.xml.bind:jaxb-impl:2.3.1")
-//    implementation("com.sun.xml.bind:jaxb-core:2.3.0.1")
 }
-
-//buildscript {
-//    dependencies {
-//        classpath(files("sda-builder/build/classes/java/main"))
-//    }
-//}
-
-val propertiesXmlFile = file("properties.xml")
-if (!propertiesXmlFile.exists())
-    error("properties.xml not found, please run EchoAdapterConstants.main() manually before")
-else
-    println("properties.xml is good")
-
-val configProps = Properties().apply {
-    FileInputStream(propertiesXmlFile).use { inputStream ->
-        loadFromXML(inputStream)
-    }
-}
-val adapterVendor = configProps["adapterVendor"]
 
 tasks.register("sapSdaFromLibs", SdaFromLibs::class.java) {
     propertyXml.set(propertiesXmlFile)
@@ -88,9 +78,29 @@ tasks.register("sapSdaFromRar", SdaFromRar::class.java) {
     }
 }
 
+tasks.register("sapSdaFromWar", SdaFromWar::class.java) {
+    dependsOn(":web-module:war")
+    dcName = configProps["dcNameWeb"].toString()
+    propertyXml.set(propertiesXmlFile)
 
-/*
+    warFile.set(file("web-module/build/libs/web-module.war"))
+    sdaFile.set(file("build/$adapterVendor~${dcName.get()}.sda"))
+    doLast {
+        buildSDA()
+    }
+}
 
-    dependsOn(":web-module:build")
+tasks.register("sapSca", Sca::class.java) {
+    propertyXml.set(propertiesXmlFile)
 
- */
+    sdaFiles.from(fileTree("build").matching {include("*.sda")})
+    scaFile.set(file("p:/workspace/ZRSUGIO00_1.sca"))
+    scaFile.set(file("build/ZRSUGIO00_1.sca"))
+    doLast {
+        buildSCA()
+    }
+}
+
+tasks.register("sap") {
+    dependsOn("sapRarFromJar", "sapSdaFromLibs", "sapSdaFromRar", "sapSdaFromWar")
+}

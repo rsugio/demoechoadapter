@@ -24,7 +24,7 @@ import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public abstract class SdaFromRar extends DefaultTask {
+public abstract class SdaFromWar extends DefaultTask {
     @Input
     public abstract Property<@NotNull String> getDcName();
 
@@ -32,35 +32,34 @@ public abstract class SdaFromRar extends DefaultTask {
     public abstract RegularFileProperty getPropertyXml();
 
     @InputFile
-    public abstract RegularFileProperty getRarFile();
+    public abstract RegularFileProperty getWarFile();
 
     @OutputFile
     public abstract RegularFileProperty getSdaFile();
 
     @TaskAction
     public void buildSDA() throws IOException {
-        // Строит SDA поверх RAR
+        // Строит SDA поверх WAR
         Properties props = new Properties();
         props.loadFromXML(new FileInputStream(getPropertyXml().get().getAsFile()));
 
         String version = Objects.requireNonNull(props.getProperty("adapterVersion"));
         String vendorName = Objects.requireNonNull(props.getProperty("adapterVendor"));
         String vendorLocation = Objects.requireNonNull(props.getProperty("adapterVendorLocation"));
-        String dcNameLib = Objects.requireNonNull(props.getProperty("dcNameLib"));
-        //String dcNameRA = Objects.requireNonNull(props.getProperty("dcNameRA"));
+        String warName = getDcName().get() + ".war";
 
         String keyCounter = version + "." + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddhhmmss"));
 
-        File rarFile = getRarFile().getAsFile().get();
+        File warFile = getWarFile().getAsFile().get();
         File sdaFile = getSdaFile().getAsFile().get();
-        getLogger().lifecycle("SDA {} from RAR {}", sdaFile, rarFile);
+        getLogger().lifecycle("SDA {} from RAR {}", sdaFile, warFile);
         if (!Files.isDirectory(sdaFile.toPath().getParent())) {
             Files.createDirectories(sdaFile.toPath().getParent());
         }
 
         List<DeployReference> deployReferenceList = new LinkedList<>();
         deployReferenceList.addAll(Dependencies.deployReferenceList);
-        deployReferenceList.add(new DeployReference("hard", "library", vendorName, dcNameLib));
+//        deployReferenceList.add(new DeployReference("hard", "library", vendorName, dcNameLib));
 
         OutputStream os = new FileOutputStream(sdaFile);
         ZipOutputStream zos = new ZipOutputStream(os, StandardCharsets.UTF_8);
@@ -72,15 +71,17 @@ public abstract class SdaFromRar extends DefaultTask {
 
         zipEntry = new ZipEntry("META-INF/application-j2ee-engine.xml");
         zos.putNextEntry(zipEntry);
-        String s = Komar.generateApplicationJ2eeEngineXml(deployReferenceList, null, null, vendorName);
+        String s = Komar.generateApplicationJ2eeEngineXml(deployReferenceList, warName, "WebContainer", vendorName);
         IOUtils.write(s, zos);
         zos.closeEntry();
 
         zipEntry = new ZipEntry("META-INF/application.xml");
         zos.putNextEntry(zipEntry);
-        s = Komar.generateApplicationXmlRar(
+        s = Komar.generateApplicationXmlWar(
                 Objects.requireNonNull(props.getProperty("kolhoz")),
-                Objects.requireNonNull(getRarFile().get().getAsFile().getName()));
+                warName,
+                Objects.requireNonNull(props.getProperty("webContextRoot"))
+        );
         IOUtils.write(s, zos);
         zos.closeEntry();
 
@@ -107,8 +108,6 @@ public abstract class SdaFromRar extends DefaultTask {
         atts.put(new Attributes.Name("keyname"), getDcName().get());
         atts.put(new Attributes.Name("keycounter"), keyCounter);
         atts.put(new Attributes.Name("keylocation"), vendorLocation);
-//        atts.put(new Attributes.Name("dependencylist"), sdaSapManifestDependencyList());
-//      atts.put(new Attributes.Name("dependencies"), EchoAdapterConstants.dependencies);
         atts.put(new Attributes.Name("softwaretype"), "J2EE");
         atts.put(new Attributes.Name("deployfile"), "j2ee-dd.xml");
 
@@ -130,9 +129,9 @@ public abstract class SdaFromRar extends DefaultTask {
 //            zos.closeEntry();
 //        }
 
-        zipEntry = new ZipEntry(getRarFile().get().getAsFile().getName());
+        zipEntry = new ZipEntry(warName);
         zos.putNextEntry(zipEntry);
-        IOUtils.copy(new FileInputStream(rarFile), zos);
+        IOUtils.copy(new FileInputStream(warFile), zos);
         zos.closeEntry();
 
         zos.close();

@@ -2,20 +2,22 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
 <comment>Константы для сборки адаптера Echo из файла demoecho.EchoAdapterConstants</comment>
+<entry key="raCCIConnectionFactory">demoecho.CCIConnectionFactory</entry>
+<entry key="adapterVendor">rsug.io</entry>
 <entry key="raEis">Без EIS (локальная обработка)</entry>
-<entry key="raSPIManagedConnectionFactory">demoecho.SPIManagedConnectionFactory</entry>
-<entry key="dcNameLib">demo.echoadapter.lib</entry>
-<entry key="adapterNamespace">urn:demo</entry>
+<entry key="webContextRoot">rsug.io~demoecho</entry>
+<entry key="adapterType">Echo</entry>
+<entry key="adapterVersion">1</entry>
+<entry key="kolhoz">&#128229; Колхозная, им.тов.Гредлова, система сборки RAR/SDA. Ибо нефиг.</entry>
+<entry key="jndi">deployedAdapters/demo.echoadapter.ra/shareable/demo.echoadapter.ra</entry>
 <entry key="dcNameRA">demo.echoadapter.ra</entry>
+<entry key="swcName">ZRSUGIO</entry>
+<entry key="raShortName">demo.echoadapter</entry>
+<entry key="dcNameWeb">demo.echoadapter.web</entry>
+<entry key="adapterNamespace">urn:demo</entry>
 <entry key="raCCIConnection">demoecho.CCIConnection</entry>
 <entry key="raDescription">Модель для сборки</entry>
-<entry key="adapterType">Echo</entry>
-<entry key="raCCIConnectionFactory">demoecho.CCIConnectionFactory</entry>
-<entry key="kolhoz">&#128229; Колхозная, им.тов.Гредлова, система сборки RAR/SDA. Ибо нефиг.</entry>
-<entry key="raShortName">demo.echoadapter</entry>
-<entry key="swcName">ZRSUGIO</entry>
-<entry key="adapterVersion">1</entry>
-<entry key="adapterVendor">rsug.io</entry>
-<entry key="jndi">deployedAdapters/demo.echoadapter.ra/shareable/demo.echoadapter.ra</entry>
+<entry key="dcNameLib">demo.echoadapter.lib</entry>
+<entry key="raSPIManagedConnectionFactory">demoecho.SPIManagedConnectionFactory</entry>
 <entry key="adapterVendorLocation">Russia, Moscow</entry>
 </properties>
