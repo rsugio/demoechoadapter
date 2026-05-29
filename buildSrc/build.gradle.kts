@@ -1,5 +1,7 @@
+
 plugins {
-    id("java-library")
+    `java-gradle-plugin`
+    `kotlin-dsl`  // если нужна поддержка Kotlin в buildSrc
 }
 
 repositories {
@@ -7,12 +9,21 @@ repositories {
     mavenCentral()
 }
 
+gradlePlugin {
+    plugins {
+        create("sda-packer") {
+            id = "io.rsug.sda-packer"
+            implementationClass = "SdaBuildTask"
+        }
+    }
+}
+
 dependencies {
-    implementation("io.rsug:komar:0.0.1")
-    implementation("org.apache.commons:commons-lang3:3.20.0")
-//    implementation("javax.resource:connector-api:1.5")
-    implementation("org.ow2.asm:asm:9.6")
+    // Добавляем зависимости при необходимости
+    // implementation("com.sap:sap-sda-api:1.0")
     implementation("commons-io:commons-io:2.22.0")
+    implementation("io.rsug:komar:0.0.1")
+
     implementation("javax.xml.bind:jaxb-api:2.3.1")
     implementation("com.sun.xml.bind:jaxb-impl:2.3.1")
     implementation("com.sun.xml.bind:jaxb-core:2.3.0.1")

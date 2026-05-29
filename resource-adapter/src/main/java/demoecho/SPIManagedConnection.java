@@ -8,7 +8,6 @@ import javax.resource.spi.*;
 import javax.resource.spi.security.PasswordCredential;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
-import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.lang.IllegalStateException;
 import java.util.HashSet;

@@ -18,7 +18,7 @@ public class SPIManagedConnectionMetaData implements ManagedConnectionMetaData {
     }
 
     public String getEISProductVersion() throws ResourceException {
-        return EchoAdapterConstants.raVersion;
+        return EchoAdapterConstants.adapterVersion;
     }
 
     public int getMaxConnections() throws ResourceException {

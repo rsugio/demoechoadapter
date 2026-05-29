@@ -1,8 +1,4 @@
-rootProject.name = "EchoAdapter"
+rootProject.name = "echoadapter"
 
-// Новый WAR-модуль
+include("resource-adapter")
 include("web-module")
-
-// Если нужно переименовать WAR-файл
-//project(":web-module").name = "my-web-app"
-

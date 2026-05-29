@@ -3,7 +3,6 @@ package demoecho;
 
 import javax.resource.ResourceException;
 import javax.resource.cci.ConnectionMetaData;
-import javax.resource.spi.security.PasswordCredential;
 
 public class CCIConnectionMetaData implements ConnectionMetaData {
     private static final XITrace TRACE = new XITrace(CCIConnectionMetaData.class.getName());
@@ -18,7 +17,7 @@ public class CCIConnectionMetaData implements ConnectionMetaData {
     }
 
     public String getEISProductVersion() throws ResourceException {
-        return EchoAdapterConstants.raVersion;
+        return EchoAdapterConstants.adapterVersion;
     }
 
     public String getUserName() throws ResourceException {

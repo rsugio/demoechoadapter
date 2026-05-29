@@ -15,7 +15,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 public class Util {
-    private static final Location TRACE = Location.getLocation(com.sap.aii.adapter.odata.ra.xi.util.Util.class);
+    private static final Location TRACE = Location.getLocation(Util.class);
     private static LocalizationCallback localizer = null;
     private static Locale locale = null;
 
@@ -162,7 +162,7 @@ public class Util {
             } else if (this.getClass() != obj.getClass()) {
                 return false;
             } else {
-                com.sap.aii.adapter.odata.ra.xi.util.Util.InternalChannelStatus other = (com.sap.aii.adapter.odata.ra.xi.util.Util.InternalChannelStatus)obj;
+                Util.InternalChannelStatus other = (Util.InternalChannelStatus)obj;
                 if (this.state == null) {
                     if (other.state != null) {
                         return false;

@@ -4,7 +4,7 @@ import javax.resource.cci.ResourceAdapterMetaData;
 public class CCIResourceAdapterMetaData implements ResourceAdapterMetaData {
     private static final XITrace TRACE = new XITrace(CCIResourceAdapterMetaData.class.getName());
     private String vendorName = EchoAdapterConstants.adapterVendor;
-    private String adapterVersion = EchoAdapterConstants.raVersion;
+    private String adapterVersion = EchoAdapterConstants.adapterVersion;
     private String specVersion = "1.0";
     private String adapterName = EchoAdapterConstants.adapterType;
     private String description = EchoAdapterConstants.raDescription;
