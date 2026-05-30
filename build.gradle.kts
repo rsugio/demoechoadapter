@@ -91,11 +91,12 @@ tasks.register("sapSdaFromWar", SdaFromWar::class.java) {
 }
 
 tasks.register("sapSca", Sca::class.java) {
+    dependsOn("sapRarFromJar", "sapSdaFromLibs", "sapSdaFromRar", "sapSdaFromWar")
     propertyXml.set(propertiesXmlFile)
 
     sdaFiles.from(fileTree("build").matching {include("*.sda")})
-    scaFile.set(file("p:/workspace/ZRSUGIO00_1.sca"))
-    scaFile.set(file("build/ZRSUGIO00_1.sca"))
+//    scaFile.set(file("p:/workspace/ZRSUGIO01_0.sca"))
+    scaFile.set(file("build/ZRSUGIO01_0.sca"))
     doLast {
         buildSCA()
     }

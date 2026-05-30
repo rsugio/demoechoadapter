@@ -20,6 +20,7 @@ tasks.war {
 dependencies {
     //providedCompile("javax.servlet:javax.servlet-api:3.1.0")
     providedCompile("javax.servlet:servlet-api:2.5")
+    implementation("org.apache.wicket:wicket-core:7.18.0")
 }
 
 // Настройка source sets

@@ -1,7 +1,5 @@
-import io.rsug.komar.Komar
-
 plugins {
-    java
+    `java-library`
 }
 
 repositories {
@@ -22,12 +20,11 @@ dependencies {
             )
         )
     )
-    implementation("com.google.code.gson:gson:2.13.2")
+//    implementation("com.google.code.gson:gson:2.13.2")
 //    implementation("org.apache.commons:commons-lang3:3.20.0")
 //    implementation("commons-io:commons-io:2.22.0")
     implementation("javax.resource:connector-api:1.5")    // см.connector.jar из ./libs
 
-    //testImplementation("javax.resource:javax.resource-api:1.7.0")
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -36,14 +33,3 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
-
-//tasks.jar {
-//    dependsOn(tasks.compileJava)
-//    doFirst {
-//        file("$temporaryDir/META-INF/ra.xml").apply {
-//            parentFile.mkdirs()
-//            writeText(EchoAdapterConstants.raName)
-//        }
-//        from(temporaryDir)
-//    }
-//}
