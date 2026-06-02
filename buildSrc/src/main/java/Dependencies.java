@@ -27,6 +27,15 @@ public class Dependencies {
 //        deployReferenceList.add(DeployReference.serviceHard("com.sap.aii.adapter.xi.svc"));
         deployReferenceList.add(DeployReference.serviceHard("tc/je/appconfiguration/api"));
 
+        // from com.sap.aii.adapter.xi.svc_api.jar
+        //  import com.sap.aii.adapter.xi.ms.XIMessage
+        deployReferenceList.add(DeployReference.serviceHard("com.sap.aii.adapter.xi.svc"));
+
+        // from com.sap.aii.af.sdk.jar
+        // import ErrorCategory
+        deployReferenceList.add(DeployReference.libraryHard("com.sap.aii.af.sdk.lib"));
+
+
 //        deployReferenceList.add(DeployReference.applicationWeak("com.sap.xi.directory"));
 //        deployReferenceList.add(DeployReference.applicationHard("com.sap.aii.adapter.picao.util.app"));
 //        deployReferenceList.add(DeployReference.applicationWeak("com.sap.aii.utilxi.server"));

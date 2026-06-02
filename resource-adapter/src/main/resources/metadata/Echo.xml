@@ -49,6 +49,9 @@
                 <AttributeReference>
                     <ReferenceName>text64</ReferenceName>
                 </AttributeReference>
+                <AttributeReference>
+                    <ReferenceName>throwFault</ReferenceName>
+                </AttributeReference>
             </Tab>
         </GlobalChannelAttributes>
     </Outbound>
@@ -64,13 +67,13 @@
         <FixedValue>
             <value>active</value>
             <GuiLabels>
-                <Label language="EN">Active</Label>
+                <Label language="EN">active</Label>
             </GuiLabels>
         </FixedValue>
         <FixedValue>
             <value>inactive</value>
             <GuiLabels>
-                <Label language="EN">Inactive</Label>
+                <Label language="EN">inactive</Label>
             </GuiLabels>
         </FixedValue>
     </Attribute>
@@ -84,5 +87,33 @@
         <GuiLabels>
             <Label language="EN">text64</Label>
         </GuiLabels>
+    </Attribute>
+    <Attribute isPassword="false">
+        <Name>throwFault</Name>
+        <Usage>required</Usage>
+        <Default>never</Default>
+        <DataType>xsd:string</DataType>
+        <Length>0</Length>
+        <GuiLabels>
+            <Label language="EN">Throw faults when ...</Label>
+        </GuiLabels>
+        <FixedValue>
+            <value>never</value>
+            <GuiLabels>
+                <Label language="EN">never</Label>
+            </GuiLabels>
+        </FixedValue>
+        <FixedValue>
+            <value>always</value>
+            <GuiLabels>
+                <Label language="EN">always</Label>
+            </GuiLabels>
+        </FixedValue>
+        <FixedValue>
+            <value>dynamicConfKey</value>
+            <GuiLabels>
+                <Label language="EN">dynamicConfKey</Label>
+            </GuiLabels>
+        </FixedValue>
     </Attribute>
 </AdapterTypeMetaData>

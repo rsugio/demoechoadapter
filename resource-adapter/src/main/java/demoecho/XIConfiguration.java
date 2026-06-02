@@ -40,7 +40,7 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
     private SPIManagedConnectionFactory mcf;
 
     // из коммуникационного канала:
-    private String text64 = null, adapterStatus = null;
+    private String text64 = null, adapterStatus = null, throwFault;
     // из пропертей
 //    final PropertyConfiguration propertyListener = new PropertyConfiguration();
     ApplicationPropertiesAccess applicationConfiguration = null;
@@ -392,12 +392,16 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
         tsr.addTestResult(tr);
         tr = new SingleTestResult(2, "centralFileLogDirectory", centralFileLogDirectory);
         tsr.addTestResult(tr);
+        tr = new SingleTestResult(2, "throwFault", throwFault);
+        tsr.addTestResult(tr);
         return tsr;
     }
 
+    //TODO сделать имена параметров из EchoAdapterConstants
     private void readChannelAttributes(Channel channel) throws CPAException {
         text64 = channel.getValueAsString("text64");
         adapterStatus = channel.getValueAsString("adapterStatus");
+        throwFault = channel.getValueAsString("throwFault");
         if (applicationConfiguration == null) {
             try {
                 InitialContext ctx = new InitialContext();

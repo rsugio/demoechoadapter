@@ -1,0 +1,22 @@
+<SAP:Error xmlns:SAP="http://sap.com/xi/XI/Message/30" xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/"
+           SOAP:mustUnderstand="1">
+    <SAP:Category>XIServer</SAP:Category>
+    <SAP:Code area="INTERNAL">CLIENT_RECEIVE_FAILED</SAP:Code>
+    <SAP:P1>Configuration error on Adapter-Framework(AFW)-Server</SAP:P1>
+    <SAP:P2>com.sap.engine.interfaces.messaging.api.exception.MessagingException:
+        com.sap.engine.interfaces.messaging.api.exception.MessagingException: java.lang.IllegalArgumentException: The
+        error category 'Adapter' is unknown. at
+        com.sap.aii.adapter.soap.web.SOAPHandler.processSOAPtoXMB(SOAPHandler.java:845) at
+        com.sap.aii.adapter.soap.web.MessageServlet.doPost(MessageServlet.java:698) at
+    </SAP:P2>
+    <SAP:P3>More details about AFW error can be found in XI monitor MessagingException</SAP:P3>
+    <SAP:P4/>
+    <SAP:AdditionalText/>
+    <SAP:Stack>Ошибка при получении с помощью HTTP (код ошибки: Configuration error on Adapter-Framework(AFW)-Server,
+        текст ошибки: com.sap.engine.interfaces.messaging.api.exception.MessagingException:
+        com.sap.engine.interfaces.messaging.api.exception.MessagingException: java.lang.IllegalArgumentException: The
+        error category 'Adapter' is unknown. at
+        com.sap.aii.adapter.soap.web.SOAPHandler.processSOAPtoXMB(SOAPHandler.java:845) at
+    </SAP:Stack>
+    <SAP:Retry>N</SAP:Retry>
+</SAP:Error>

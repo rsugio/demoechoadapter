@@ -1,23 +1,20 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package demoecho;
 
-import com.sap.aii.af.lib.ra.cci.XIAdapterException;
+import com.sap.aii.adapter.xi.ms.XIErrorInfoImpl;
 import com.sap.aii.af.lib.ra.cci.XIInteraction;
 import com.sap.aii.af.lib.ra.cci.XIInteractionSpec;
 import com.sap.aii.af.lib.ra.cci.XIMessageRecord;
+import com.sap.aii.af.sdk.xi.util.ErrorCategory;
 import com.sap.aii.af.service.administration.api.cpa.CPAFactory;
 import com.sap.aii.af.service.administration.api.cpa.CPAOutboundRuntimeLookupManager;
 import com.sap.aii.af.service.cpa.*;
 import com.sap.aii.af.service.headermapping.HeaderMapper;
 import com.sap.aii.af.service.headermapping.HeaderMappingException;
-import com.sap.aii.af.service.idmap.MessageIDMapper;
 import com.sap.engine.interfaces.messaging.api.*;
 import com.sap.engine.interfaces.messaging.api.auditlog.AuditAccess;
 import com.sap.engine.interfaces.messaging.api.auditlog.AuditLogStatus;
+import com.sap.engine.interfaces.messaging.api.exception.InvalidParamException;
+import com.sap.engine.interfaces.messaging.api.exception.PayloadFormatException;
 
 import javax.resource.NotSupportedException;
 import javax.resource.ResourceException;
@@ -29,7 +26,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Map;
+import com.sap.aii.adapter.xi.ms.XIMessage;
 
 public class CCIInteraction implements XIInteraction {
     private static final XITrace TRACE = new XITrace(CCIInteraction.class.getName());
@@ -41,7 +41,7 @@ public class CCIInteraction implements XIInteraction {
 
     public CCIInteraction(Connection cciConnection) throws ResourceException {
         String SIGNATURE = "CciInteraction(javax.resource.cci.Connection)";
-        TRACE.entering("CciInteraction(javax.resource.cci.Connection)", new Object[]{cciConnection});
+        TRACE.entering(SIGNATURE, new Object[]{cciConnection});
         if (cciConnection == null) {
             ResourceException re = new ResourceException("No related CCI connection in Interaction (cciConnection is null).");
             TRACE.throwing("CciInteraction(javax.resource.cci.Connection)", re);
@@ -74,14 +74,14 @@ public class CCIInteraction implements XIInteraction {
 
     public void close() throws ResourceException {
         String SIGNATURE = "close()";
-        TRACE.entering("close()");
+        TRACE.entering(SIGNATURE);
         this.connection = null;
-        TRACE.exiting("close()");
+        TRACE.exiting(SIGNATURE);
     }
 
     public boolean execute(InteractionSpec ispec, Record input, Record output) throws ResourceException {
         String SIGNATURE = "execute(InteractionSpec ispec, Record input, Record output)";
-        TRACE.entering("execute(InteractionSpec ispec, Record input, Record output)");
+        TRACE.entering(SIGNATURE);
         if (!(output instanceof XIMessageRecord)) {
             ResourceException re = new ResourceException("Output record is no XI AF XIMessageRecord.");
             TRACE.throwing("execute(InteractionSpec ispec, Record input, Record output)", re);
@@ -109,11 +109,11 @@ public class CCIInteraction implements XIInteraction {
 
     public Record execute(InteractionSpec ispec, Record input) throws ResourceException {
         String SIGNATURE = "execute(InteractionSpec ispec, Record input)";
-        TRACE.entering("execute(InteractionSpec ispec, Record input)", new Object[]{ispec, input});
+        TRACE.entering(SIGNATURE, new Object[]{ispec, input});
         Record output = null;
         if (ispec == null) {
             ResourceException re = new ResourceException("Input ispec is null.");
-            TRACE.throwing("execute(InteractionSpec ispec, Record input)", re);
+            TRACE.throwing(SIGNATURE, re);
             throw re;
         } else if (!(ispec instanceof XIInteractionSpec)) {
             ResourceException re = new ResourceException("Input ispec is no XI AF InteractionSpec.");
@@ -275,7 +275,7 @@ public class CCIInteraction implements XIInteraction {
 
     private String[] getFaultIF(String channelID) {
         String SIGNATURE = "getFaultIF(String channelID)";
-        TRACE.entering("getFaultIF(String channelID)", new Object[]{channelID});
+        TRACE.entering(SIGNATURE, new Object[]{channelID});
         String[] result = new String[2];
 
         try {
@@ -361,6 +361,97 @@ public class CCIInteraction implements XIInteraction {
     }
 
     private Record call(InteractionSpec ispec, Record input, SPIManagedConnection mc) throws ResourceException {
+        String SIGNATURE = "call(InteractionSpec ispec, Record input, SpiManagedConnection mc)";
+        TRACE.entering(SIGNATURE);
+        if (input == null) {
+            ResourceException re = new ResourceException("sync call receiver: input record is null");
+            TRACE.throwing(SIGNATURE, re);
+            throw re;
+        }
+        if (!(input instanceof XIMessageRecord)) {
+            ResourceException re = new ResourceException("Input record is not instance of Message.");
+            TRACE.throwing(SIGNATURE, re);
+            throw re;
+        }
+        Message msg = ((XIMessageRecord) input).getXIMessage();
+        MessageKey amk = new MessageKey(msg.getMessageId(), MessageDirection.INBOUND);
+        String[] result = this.getMappedHeaderFieldsAndNormalize(mc.getChannelID(), msg);
+//        String fromParty = result[0];
+//        String fromService = result[1];
+//        String toParty = result[2];
+//        String toService = result[3];
+        Payload appPayLoad = msg.getDocument();
+//        String payText = new String(appPayLoad.getContent());
+        XIMessageRecordImpl output;
+//        TRACE.debugT("call(InteractionSpec ispec, Record input, SpiManagedConnection mc)", XIAdapterCategories.CONNECT, "Payload contains the <ApplicationError> tag that causes a application error response for testing purposes!");
+//        this.audit.addAuditLogEntry(amk, AuditLogStatus.ERROR, "Simulate application error response now.");
+
+        String[] faultIF;
+        faultIF = new String[]{"FMT_Fault", "urn:demo"}; //this.getFaultIF(mc.getChannelID());
+//        faultIF = new String[]{"SI_Demo_InSync", "urn:demo"}; //this.getFaultIF(mc.getChannelID());
+        Action action = new Action(faultIF[0], faultIF[1]);
+        output = new XIMessageRecordImpl(msg.getToParty(), msg.getFromParty(), msg.getToService(), msg.getFromService(), action);
+
+        XIMessage response = (XIMessage) output.getXIMessage();
+        String s = "<x:FMT_Demo xmlns:x=\"urn:demo\">\n" +
+                "<standard><faultText>ф1</faultText><faultUrl>урл2</faultUrl><faultDetail><severity>3</severity><text>4</text><url>урл5</url><id>6</id></faultDetail></standard>\n" +
+                "<addition string=\"добавка7\"/>\n" +
+                "</x:FMT_Demo>";
+        XMLPayload xp = response.createXMLPayload();
+
+        try {
+
+            xp.setContentType("application/xml");
+            xp.setName("MainDocument");
+            xp.setContent(s.getBytes(StandardCharsets.UTF_8));
+            //xp.setDescription("//TODO");
+            response.setDocument(xp);
+            String requestId = msg.getMessageId();
+            response.setRefToMessageId(requestId);
+
+            MessagePropertyKey mpk = new MessagePropertyKey("EchoResponseName", "urn:demo");
+            response.setMessageProperty(mpk, "Error");
+
+            XIErrorInfoImpl errorInfo = (XIErrorInfoImpl) response.createErrorInfo();
+            String[] names = errorInfo.getSupportedAttributeNames();
+            if (names != null) {
+                // ErrorCode, ErrorArea, ErrorCategory, AdditionalErrorText, ApplicationFaultInterface, ApplicationFaultInterfaceNamespace, P1, P2, P3, P4
+                TRACE.debugT(SIGNATURE, "ErrorInfo.class={0}, errorInfo.getSupportedAttributeNames: {1}", new Object[]{ErrorInfo.class.getName(), Arrays.toString(names)});
+            }
+
+            errorInfo.setAttribute("ErrorCategory", ErrorCategory.APPLICATION.toString());
+            errorInfo.setAttribute("ErrorCode", "REST_ADAPTER_PROCESSING_ERROR");
+            errorInfo.setAttribute("ErrorArea", "REST_Adapter");
+            errorInfo.setAttribute("AdditionalErrorText", "statusText статустекст");
+
+            response.setMessageClass(MessageClass.APPLICATION_ERROR);
+            //response.setError("UNKNOWN", "403 Unauthorized");
+
+//            errorInfo.setAttribute("ErrorCode", "FATAL");
+//            errorInfo.setAttribute("ErrorArea", "APPLICATION");
+//            errorInfo.setAttribute("ErrorCategory", "Application");
+//            errorInfo.setAttribute("ErrorCategory", "XIServer");
+////            errorInfo.setAttribute("ErrorCategory", "Adapter");
+//            errorInfo.setAttribute("AdditionalErrorText", "4MainDocument has contained the <ApplicationError> element that triggers the JCA adapter to create an app error response as demo!");
+            errorInfo.setAttribute("ApplicationFaultInterface", faultIF[0]);
+            errorInfo.setAttribute("ApplicationFaultInterfaceNamespace", faultIF[1]);
+//            errorInfo.setAttribute("P1", "p1 text");
+//            errorInfo.setAttribute("P2", "p2 text");
+//            errorInfo.setAttribute("P3", "p3 text");
+//            errorInfo.setAttribute("P4", "p4 text");
+            response.setErrorInfo(errorInfo);
+        } catch (PayloadFormatException | InvalidParamException e) {
+            TRACE.catching(SIGNATURE, e);
+            ResourceException re = new ResourceException("System error: " + e.getMessage());
+            TRACE.throwing(SIGNATURE, re);
+            throw re;
+        }
+        TRACE.exiting(SIGNATURE, output);
+        return output;
+    }
+
+    @Deprecated
+    private Record callDeprecated(InteractionSpec ispec, Record input, SPIManagedConnection mc) throws ResourceException {
         String SIGNATURE = "call(InteractionSpec ispec, Record input, SpiManagedConnection mc)";
         TRACE.entering("call(InteractionSpec ispec, Record input, SpiManagedConnection mc)");
         if (input == null) {
@@ -509,4 +600,24 @@ public class CCIInteraction implements XIInteraction {
     public XIInteractionSpec getXIInteractionSpec() throws NotSupportedException {
         return new XIInteractionSpecImpl();
     }
+
+
+    private void setApplicationError(XIMessage resultMessage, int statusCode, String statusText, String faultIn, String faultIntNS) throws InvalidParamException {
+        resultMessage.setMessageClass(MessageClass.APPLICATION_ERROR);
+        resultMessage.setError("UNKNOWN", "" + statusCode + " " + statusText);
+        ErrorInfo xierror = resultMessage.createErrorInfo();
+        xierror.setAttribute("ErrorCategory", ErrorCategory.XI_ADAPTER_FRAMEWORK.toString());
+        xierror.setAttribute("ErrorCode", "REST_ADAPTER_PROCESSING_ERROR");
+        xierror.setAttribute("ErrorArea", "REST_Adapter");
+        xierror.setAttribute("AdditionalErrorText", statusText);
+        if (faultIn != null) {
+            xierror.setAttribute("ApplicationFaultInterface", faultIn);
+        }
+
+        if (faultIntNS != null) {
+            xierror.setAttribute("ApplicationFaultInterfaceNamespace", faultIntNS);
+        }
+        resultMessage.setErrorInfo(xierror);
+    }
+
 }

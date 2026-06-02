@@ -1,9 +1,6 @@
 package demoecho;
 
-import com.sap.aii.mapping.api.AbstractTransformation;
-import com.sap.aii.mapping.api.StreamTransformationException;
-import com.sap.aii.mapping.api.TransformationInput;
-import com.sap.aii.mapping.api.TransformationOutput;
+import com.sap.aii.mapping.api.*;
 import demoecho.jaxb.DTDemoRequest;
 import demoecho.jaxb.DTDemoResponse;
 import demoecho.jaxb.ObjectFactory;
@@ -16,12 +13,15 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.math.BigInteger;
 
 public class JM_DemoEchoRequest extends AbstractTransformation {
     static final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     final DocumentBuilder db;
+
+    DynamicConfiguration dc = null;
+    DynamicConfigurationKey dcKeyDemo = DynamicConfigurationKey.create("urn:demo", "throwFault");
+
 
     public JM_DemoEchoRequest() throws ParserConfigurationException {
         dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
@@ -34,11 +34,12 @@ public class JM_DemoEchoRequest extends AbstractTransformation {
         db = dbf.newDocumentBuilder();
     }
 
-    public static void marshaller(JAXBContext ctx, Object o, OutputStream os) throws JAXBException {
+    public static void marshaller(JAXBContext ctx, Object o, OutputStream os) throws JAXBException, IOException {
         Marshaller marshaller = ctx.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
         marshaller.marshal(o, os);
+        os.flush();
     }
 
     @Override
@@ -47,13 +48,15 @@ public class JM_DemoEchoRequest extends AbstractTransformation {
         JAXBContext ctx;
         Unmarshaller unmarshaller;
         JAXBElement<DTDemoRequest> jmtDemoRequest;
+        dc = tin.getDynamicConfiguration();
+//        final String interfaceName = tin.getInputHeader().getInterface();
         try {
             doc = db.parse(tin.getInputPayload().getInputStream());
         } catch (SAXException | IOException e) {
             throw new StreamTransformationException(e.getMessage(), e.getCause());
         }
         try {
-            ctx = JAXBContext.newInstance("demoecho.jaxb");
+            ctx = JAXBContext.newInstance(demoecho.jaxb.ObjectFactory.class.getPackage().getName());
             unmarshaller = ctx.createUnmarshaller();
             jmtDemoRequest = unmarshaller.unmarshal(doc, DTDemoRequest.class);
         } catch (JAXBException e) {
@@ -67,7 +70,7 @@ public class JM_DemoEchoRequest extends AbstractTransformation {
         JAXBElement<DTDemoResponse> jresponse = new ObjectFactory().createMTDemoResponse(response);
         try {
             marshaller(ctx, jresponse, tout.getOutputPayload().getOutputStream());
-        } catch (JAXBException e) {
+        } catch (JAXBException | IOException e) {
             throw new StreamTransformationException(e.getMessage(), e.getCause());
         }
     }

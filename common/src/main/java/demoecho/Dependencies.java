@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Objects;
 
 public class Dependencies {
     public static final String kolhoz = "\uD83D\uDCE5 Колхозная, им.тов.Гредлова, система сборки RAR/SDA. Ибо нефиг.";
@@ -30,6 +29,11 @@ public class Dependencies {
         my.getAttributeOrAttributeTableOrDynamicAttributes().add(adapterStatus);
         Attribute text64 = AdapterMetaData.text("text64", 64);
         my.getAttributeOrAttributeTableOrDynamicAttributes().add(text64);
+
+        Attribute fault = AdapterMetaData.fixedValuesString("throwFault",
+                "Throw faults policy", "required", "never", "always", "dynamicConfKey");
+        my.getAttributeOrAttributeTableOrDynamicAttributes().add(fault);
+
         Outbound out = AdapterMetaData.outbound(my, "NoProtocol");
         ModuleConfig mc = new ModuleConfig();
         ModuleConfigItem mci = new ModuleConfigItem();
@@ -42,7 +46,13 @@ public class Dependencies {
         AttributeReference ar = new AttributeReference();
         ar.setReferenceName(text64.getName());
         out.getGlobalChannelAttributes().getTab().getAttributeReferenceOrAttributeGroup().add(ar);
+
+        AttributeReference arfault = new AttributeReference();
+        arfault.setReferenceName(fault.getName());
+        out.getGlobalChannelAttributes().getTab().getAttributeReferenceOrAttributeGroup().add(arfault);
+
         my.setOutbound(out);
+
         return Komar.marshallAdapterTypeMetaData(my);
     }
 
