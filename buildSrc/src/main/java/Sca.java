@@ -111,6 +111,7 @@ public abstract class Sca extends DefaultTask {
         atts.put(new Attributes.Name("keyvendor"), vendorName);
         atts.put(new Attributes.Name("keycounter"), keyCounter);
         atts.put(new Attributes.Name("keylocation"), vendorLocation);
+        atts.put(new Attributes.Name("csncomponent"), Objects.requireNonNull(props.getProperty("csncomponent")));
 
         atts.put(new Attributes.Name("pr_type"), "SC");
         atts.put(new Attributes.Name("pr_release"), release);

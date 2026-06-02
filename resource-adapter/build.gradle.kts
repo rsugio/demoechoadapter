@@ -24,6 +24,7 @@ dependencies {
 //    implementation("org.apache.commons:commons-lang3:3.20.0")
 //    implementation("commons-io:commons-io:2.22.0")
     implementation("javax.resource:connector-api:1.5")    // см.connector.jar из ./libs
+//    compileOnly(":common")
 
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")

@@ -140,6 +140,7 @@ public abstract class SdaFromLibs extends DefaultTask {
         atts.put(new Attributes.Name("keylocation"), vendorLocation);
         atts.put(new Attributes.Name("softwaretype"), "library");
         atts.put(new Attributes.Name("deployfile"), "javalib-dd.xml");
+        atts.put(new Attributes.Name("csncomponent"), Objects.requireNonNull(props.getProperty("csncomponent")));
 
         // componentelement и его атрибуты очень важны
         String componentelement = Komar.componentElementDC(getDcName().get(), vendorName,

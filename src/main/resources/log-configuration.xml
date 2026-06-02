@@ -8,16 +8,16 @@
 	</log-formatters>
 	
 	<log-destinations>
-		<!-- Destination for Trace Information of this ra demo.echoadapter.ra -->
+		<!-- Destination for Trace Information of this ra demoecho.echoadapter.ra -->
 		<log-destination count="5" effective-severity="DEBUG" limit="2000000" name="demo_echoadapter_ra.trc"
-			pattern="./log/applications/demo.echoadapter.ra/default.trc" type="FileLog">
+			pattern="./log/applications/demoecho.echoadapter.ra/default.trc" type="FileLog">
 			<formatter-ref name="trc"/>
 		</log-destination>
 	</log-destinations>
 
 	<log-controllers>
-		<!-- Trace Location demo.echoadapter.ra -->
-		<log-controller name="demo.echoadapter.ra" effective-severity="ERROR">
+		<!-- Trace Location demoecho.echoadapter.ra -->
+		<log-controller name="demoecho.echoadapter.ra" effective-severity="ERROR">
 			<associated-destinations>
 				<destination-ref association-type="LOG" name="demo_echoadapter_ra.trc"/>
 			</associated-destinations>

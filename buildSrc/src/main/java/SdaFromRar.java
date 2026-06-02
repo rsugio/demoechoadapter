@@ -4,10 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.OutputFile;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -33,6 +30,10 @@ public abstract class SdaFromRar extends DefaultTask {
 
     @InputFile
     public abstract RegularFileProperty getRarFile();
+
+    @InputFile
+    @Optional
+    public abstract RegularFileProperty getSapGlobalApplicationPropertiesFile();
 
     @OutputFile
     public abstract RegularFileProperty getSdaFile();
@@ -60,7 +61,8 @@ public abstract class SdaFromRar extends DefaultTask {
 
         List<DeployReference> deployReferenceList = new LinkedList<>();
         deployReferenceList.addAll(Dependencies.deployReferenceList);
-        deployReferenceList.add(new DeployReference("hard", "library", vendorName, dcNameLib));
+        DeployReference dref = new DeployReference("weak", "library", vendorName, dcNameLib);
+        deployReferenceList.add(dref);
 
         OutputStream os = new FileOutputStream(sdaFile);
         ZipOutputStream zos = new ZipOutputStream(os, StandardCharsets.UTF_8);
@@ -111,6 +113,7 @@ public abstract class SdaFromRar extends DefaultTask {
 //      atts.put(new Attributes.Name("dependencies"), EchoAdapterConstants.dependencies);
         atts.put(new Attributes.Name("softwaretype"), "J2EE");
         atts.put(new Attributes.Name("deployfile"), "j2ee-dd.xml");
+        atts.put(new Attributes.Name("csncomponent"), Objects.requireNonNull(props.getProperty("csncomponent")));
 
         String componentelement = Komar.componentElementDC(getDcName().get(), vendorName,
                 vendorLocation, keyCounter, Objects.requireNonNull(props.getProperty("swcName")), vendorName);
@@ -123,12 +126,12 @@ public abstract class SdaFromRar extends DefaultTask {
         IOUtils.write(Komar.minimalSdaDdXml("J2EE"), zos);
         zos.closeEntry();
 
-//        if (Files.exists(appPropertiesFile)) {
-//            zipEntry = new ZipEntry("META-INF/sap.application.global.properties");
-//            zos.putNextEntry(zipEntry);
-//            IOUtils.copy(Files.newInputStream(appPropertiesFile), zos);
-//            zos.closeEntry();
-//        }
+        if (getSapGlobalApplicationPropertiesFile().isPresent()) {
+            zipEntry = new ZipEntry("META-INF/sap.application.global.properties");
+            zos.putNextEntry(zipEntry);
+            IOUtils.copy(new FileInputStream(getSapGlobalApplicationPropertiesFile().get().getAsFile()), zos);
+            zos.closeEntry();
+        }
 
         zipEntry = new ZipEntry(getRarFile().get().getAsFile().getName());
         zos.putNextEntry(zipEntry);

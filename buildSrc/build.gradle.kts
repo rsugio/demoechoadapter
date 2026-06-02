@@ -20,7 +20,6 @@ gradlePlugin {
 
 dependencies {
     // Добавляем зависимости при необходимости
-    // implementation("com.sap:sap-sda-api:1.0")
     implementation("commons-io:commons-io:2.22.0")
     implementation("io.rsug:komar:0.0.1")
 

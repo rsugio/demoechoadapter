@@ -460,13 +460,13 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
 
     public void run() {
         String SIGNATURE = "run()";
-        TRACE.entering("run()");
+        TRACE.entering(SIGNATURE);
         String oldThreadName = Thread.currentThread().getName();
         String newThreadName = "XI AF Sample Adapter MCF " + this.mcfLocalGuid;
 
         try {
             Thread.currentThread().setName(newThreadName);
-            TRACE.debugT("run()", XIAdapterCategories.CONNECT_AF, "Switched thread name to: {0}", new Object[]{newThreadName});
+            TRACE.debugT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "Switched thread name to: {0}", new Object[]{newThreadName});
             boolean notSet = true;
             int numTry = 0;
             int pollTime = -1;
@@ -520,135 +520,6 @@ public class SPIManagedConnectionFactory implements ManagedConnectionFactory, Se
             }
 
             while (this.threadStatus == 1) {
-                try {
-                    LinkedList channels = this.xIConfiguration.getCopy(Direction.INBOUND);
-
-                    for (int i = 0; i < channels.size(); ++i) {
-                        Channel channel = (Channel) channels.get(i);
-
-                        try {
-                            String directory = null;
-                            String name = null;
-                            String processMode = null;
-                            String qos = null;
-                            String psec = null;
-                            String pmsec = null;
-                            String raiseError = null;
-                            String channelAddressMode = null;
-                            boolean set_asma = false;
-
-                            try {
-                                directory = channel.getValueAsString("fileInDir");
-                            } catch (Exception e) {
-                                TRACE.catching("run()", e);
-                            }
-
-                            try {
-                                name = channel.getValueAsString("fileInName");
-                            } catch (Exception e) {
-                                TRACE.catching("run()", e);
-                            }
-
-                            try {
-                                processMode = channel.getValueAsString("processMode");
-                            } catch (Exception e) {
-                                TRACE.catching("run()", e);
-                            }
-
-                            try {
-                                qos = channel.getValueAsString("qos");
-                            } catch (Exception e) {
-                                TRACE.catching("run()", e);
-                            }
-
-                            try {
-                                psec = channel.getValueAsString("filePollInterval");
-                            } catch (Exception e) {
-                                TRACE.catching("run()", e);
-                            }
-
-                            try {
-                                pmsec = channel.getValueAsString("filePollIntervalMsecs");
-                            } catch (Exception e) {
-                                TRACE.catching("run()", e);
-                            }
-
-                            try {
-                                raiseError = channel.getValueAsString("raiseError");
-                            } catch (Exception e) {
-                                TRACE.catching("run()", e);
-                            }
-
-                            try {
-                                channelAddressMode = channel.getValueAsString("channelAddressMode");
-                            } catch (Exception e) {
-                                TRACE.catching("run()", e);
-                            }
-
-                            try {
-                                set_asma = channel.getValueAsBoolean("enableDynConfigSender");
-                                if (set_asma) {
-                                    set_asma = channel.getValueAsBoolean("dynConfigJCAChannelID");
-                                }
-                            } catch (Exception e) {
-                                TRACE.catching("run()", e);
-                            }
-
-                            int ptime = 0;
-                            if (psec != null && psec.length() > 0) {
-                                ptime = Integer.valueOf(psec) * 1000;
-                            }
-
-                            if (pmsec != null && pmsec.length() > 0) {
-                                ptime += Integer.valueOf(pmsec);
-                            }
-
-                            if (pollTime < 0 || ptime < pollTime) {
-                                pollTime = ptime;
-                            }
-
-                            if (directory == null || directory.length() == 0) {
-                                TRACE.warningT("run()", XIAdapterCategories.CONNECT_AF, "Unable to determine input file directory. Take default: c:/temp");
-                                directory = "c:/temp";
-                            }
-
-                            if (name == null || name.length() == 0) {
-                                TRACE.warningT("run()", XIAdapterCategories.CONNECT_AF, "Unable to determine input file prefix. Take default: sample_ra_input");
-                                name = "sample_ra_input";
-                            }
-
-                            if (processMode == null || processMode.length() == 0) {
-                                TRACE.warningT("run()", XIAdapterCategories.CONNECT_AF, "Unable to determine processing mode. Take default: test");
-                                processMode = "test";
-                            }
-
-                            if (qos == null || qos.length() == 0) {
-                                TRACE.warningT("run()", XIAdapterCategories.CONNECT_AF, "Unable to determine QOS. Take default: EO");
-                                qos = "EO";
-                            }
-
-                            if (raiseError == null || raiseError.length() == 0) {
-                                TRACE.warningT("run()", XIAdapterCategories.CONNECT_AF, "Unable to determine error raise condition. Take default: none");
-                                raiseError = "none";
-                            }
-
-                            if (channelAddressMode == null || channelAddressMode.length() == 0) {
-                                TRACE.warningT("run()", XIAdapterCategories.CONNECT_AF, "Unable to determine address mode. Take default from JCA property: " + this.addressMode);
-                                channelAddressMode = this.addressMode;
-                            }
-
-                            String completeName = directory + "/" + name;
-                            this.sendMessageFromFile(completeName, channel, processMode, qos, raiseError, channelAddressMode, set_asma);
-                        } catch (Exception e) {
-                            TRACE.catching("run()", e);
-                            TRACE.errorT("run()", XIAdapterCategories.CONNECT_AF, "Cannot send message to channel {0}. Received exception: {1}", new Object[]{channel.getObjectId(), e.getMessage()});
-                        }
-                    }
-                } catch (Exception e) {
-                    TRACE.catching("run()", e);
-                    TRACE.errorT("run()", XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0019", "Cannot access inbound channel configuration. Received exception: " + e.getMessage());
-                }
-
                 try {
                     synchronized (this) {
                         if (pollTime <= 0) {

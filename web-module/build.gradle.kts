@@ -1,6 +1,6 @@
+
 plugins {
     war
-    java
 }
 
 repositories {
@@ -17,21 +17,25 @@ tasks.war {
 //    webXml = file("src/main/webapp/WEB-INF/web.xml")
 }
 
-dependencies {
-    //providedCompile("javax.servlet:javax.servlet-api:3.1.0")
-    providedCompile("javax.servlet:servlet-api:2.5")
-    implementation("org.apache.wicket:wicket-core:7.18.0")
-}
-
-// Настройка source sets
 sourceSets {
     main {
-        java {
-            setSrcDirs(listOf("src/main/java"))
-        }
         resources {
-            setSrcDirs(listOf("src/main/resources"))
+            srcDir("src/main/java")
+            include("**/*.html")
         }
-        // webapp не входит в standard source set
     }
+}
+
+dependencies {
+    providedCompile("javax.servlet:servlet-api:2.5")
+    implementation("org.apache.wicket:wicket-core:6.30.0")
+
+    // в основном чтение пропертей
+    providedCompile(
+        fileTree(
+            mapOf(
+                "dir" to "../libs", "include" to listOf("*.jar")
+            )
+        )
+    )
 }

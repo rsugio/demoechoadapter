@@ -1,3 +1,5 @@
+import Dependencies;
+
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -44,7 +46,7 @@ tasks.register("sapSdaFromLibs", SdaFromLibs::class.java) {
     propertyXml.set(propertiesXmlFile)
     dcName = configProps["dcNameLib"].toString()
 
-    sdaFile.set(file("build/$adapterVendor~${dcName.get()}.sda"))
+    sdaFile.set(file("build/${dcName.get()}.sda"))
     providedLibs.from(
         project.file("libs/commons-io-2.22.0.jar"),
         project.file("libs/commons-lang3-3.20.0.jar")
@@ -60,19 +62,20 @@ tasks.register("sapRarFromJar", RarFromJar::class.java) {
     propertyXml.set(propertiesXmlFile)
 
     jarFile.set(file("resource-adapter/build/libs/resource-adapter.jar"))
-    rarFile.set(file("build/$adapterVendor~${dcName.get()}.rar"))
+    rarFile.set(file("build/${dcName.get()}.rar"))
     doLast {
         buildRAR()
     }
 }
 
 tasks.register("sapSdaFromRar", SdaFromRar::class.java) {
-    dependsOn("sapRarFromJar", "sapSdaFromLibs")
+    dependsOn("sapRarFromJar")
     dcName = configProps["dcNameRA"].toString()
     propertyXml.set(propertiesXmlFile)
 
-    rarFile.set(file("build/$adapterVendor~${dcName.get()}.rar"))
-    sdaFile.set(file("build/$adapterVendor~${dcName.get()}.sda"))
+    sapGlobalApplicationPropertiesFile.set(file("src/main/resources/sap.application.global.properties"))
+    rarFile.set(file("build/${dcName.get()}.rar"))
+    sdaFile.set(file("build/${dcName.get()}.sda"))
     doLast {
         buildSDA()
     }
@@ -83,8 +86,9 @@ tasks.register("sapSdaFromWar", SdaFromWar::class.java) {
     dcName = configProps["dcNameWeb"].toString()
     propertyXml.set(propertiesXmlFile)
 
+    sapGlobalApplicationPropertiesFile.set(file("src/main/resources/sap.application.global.properties"))
     warFile.set(file("web-module/build/libs/web-module.war"))
-    sdaFile.set(file("build/$adapterVendor~${dcName.get()}.sda"))
+    sdaFile.set(file("build/${dcName.get()}.sda"))
     doLast {
         buildSDA()
     }

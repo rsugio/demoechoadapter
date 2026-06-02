@@ -1,39 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<AdapterTypeMetaData version="71"
-                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                     xsi:noNamespaceSchemaLocation="adaptermetadata.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AdapterTypeMetaData version="1">
+    <Type>Echo</Type>
+    <GuiLabels>
+        <Label language="EN">Echo adapter</Label>
+    </GuiLabels>
     <Outbound>
         <TransportProtocol>
-            <Name>Echo</Name>
-            <Version>1.0</Version>
+            <Name>NoProtocol</Name>
+            <Version>1</Version>
             <GuiLabels>
-                <Label language="EN">Echo</Label>
+                <Label language="EN">NoProtocol</Label>
             </GuiLabels>
             <ValidMessageProtocols>
                 <ProtocolIdentifier>
-                    <Name>Echo</Name>
-                    <Version>1.0</Version>
+                    <Name>NoProtocol</Name>
+                    <Version>1</Version>
                 </ProtocolIdentifier>
             </ValidMessageProtocols>
-            <ChannelAttributes>
-                <Tab id="tab1">
-                    <AttributeGroup>
-                        <Name>tab1</Name>
-                        <GuiLabels>
-                            <Label language="EN">1</Label>
-                        </GuiLabels>
-                        <AttributeReference>
-                            <ReferenceName>A</ReferenceName>
-                        </AttributeReference>
-                    </AttributeGroup>
-                </Tab>
-            </ChannelAttributes>
         </TransportProtocol>
         <MessageProtocol>
-            <Name>Echo</Name>
-            <Version>1.0</Version>
+            <Name>NoProtocol</Name>
+            <Version>1</Version>
             <GuiLabels>
-                <Label language="EN">Echo</Label>
+                <Label language="EN">NoProtocol</Label>
             </GuiLabels>
             <ModuleProcessorAttributes>
                 <ModuleSequence>
@@ -47,21 +36,53 @@
                     <ModuleConfigItem>
                         <Key>exit</Key>
                         <Name>JNDIName</Name>
-                        <!-- see EchoAdapterConstants.jndi -->
                         <Value>deployedAdapters/demo.echoadapter.ra/shareable/demo.echoadapter.ra</Value>
                     </ModuleConfigItem>
                 </ModuleConfig>
             </ModuleProcessorAttributes>
         </MessageProtocol>
-
+        <GlobalChannelAttributes>
+            <Tab id="main">
+                <AttributeReference>
+                    <ReferenceName>adapterStatus</ReferenceName>
+                </AttributeReference>
+                <AttributeReference>
+                    <ReferenceName>text64</ReferenceName>
+                </AttributeReference>
+            </Tab>
+        </GlobalChannelAttributes>
     </Outbound>
-    <Attribute>
-        <Name>A</Name>
+    <Attribute isPassword="false">
+        <Name>adapterStatus</Name>
         <Usage>optional</Usage>
-        <Default></Default>
+        <Default>active</Default>
         <DataType>xsd:string</DataType>
+        <Length>0</Length>
         <GuiLabels>
-            <Label language="EN">A</Label>
+            <Label language="EN">Adapter status</Label>
+        </GuiLabels>
+        <FixedValue>
+            <value>active</value>
+            <GuiLabels>
+                <Label language="EN">Active</Label>
+            </GuiLabels>
+        </FixedValue>
+        <FixedValue>
+            <value>inactive</value>
+            <GuiLabels>
+                <Label language="EN">Inactive</Label>
+            </GuiLabels>
+        </FixedValue>
+    </Attribute>
+    <Attribute isPassword="false">
+        <Name>text64</Name>
+        <Usage>optional</Usage>
+        <Flag>nonTransportable</Flag>
+        <Default>default value</Default>
+        <DataType>xsd:string</DataType>
+        <Length>64</Length>
+        <GuiLabels>
+            <Label language="EN">text64</Label>
         </GuiLabels>
     </Attribute>
 </AdapterTypeMetaData>

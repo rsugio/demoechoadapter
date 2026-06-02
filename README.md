@@ -66,9 +66,9 @@ https://github.com/rsugio/komar/blob/04c56633659b334ea0a46b997b4fbf333156b5a2/sr
 Возможно, придётся так сделать (в процессе отладки).
 
 Эти метаданные надо загрузить через ESR, в любой SWCV как AdapterMetadata, при этом ВАЖНО!!!
-* имя области имён `urn:demo` (конфигурируется в EchoAdapterConstants.adapterNamespace)
+* имя области имён `urn:demoecho` (конфигурируется в EchoAdapterConstants.adapterNamespace)
 * имя объекта `Echo` (конфигурируется в EchoAdapterConstants.adapterType)
-Вендор SWCV неважен. То есть, создайте Adapter Metadata `{urn:demo}Echo` и тогда они подхватятся в рантайме.
+Вендор SWCV неважен. То есть, создайте Adapter Metadata `{urn:demoecho}Echo` и тогда они подхватятся в рантайме.
 
 ## resource-adapter/src/main/java/demoecho/EchoAdapterConstants.java
 Очень важной частью является центральный конфигурационный файл, константы которого используются при компиляции и сборке
@@ -86,26 +86,27 @@ EchoAdapterConstants.java при запуске `public static void main()` со
 в формате xml. Сегодня это:
 
 ```xml
+
 <properties>
-<comment>Константы для сборки адаптера Echo из файла demoecho.EchoAdapterConstants</comment>
-<entry key="raCCIConnectionFactory">demoecho.CCIConnectionFactory</entry>
-<entry key="adapterVendor">rsug.io</entry>
-<entry key="raEis">Без EIS (локальная обработка)</entry>
-<entry key="webContextRoot">rsug.io~demoecho</entry>
-<entry key="adapterType">Echo</entry>
-<entry key="adapterVersion">1</entry>
-<entry key="kolhoz">&#128229; Колхозная, им.тов.Гредлова, система сборки RAR/SDA. Ибо нефиг.</entry>
-<entry key="jndi">deployedAdapters/demo.echoadapter.ra/shareable/demo.echoadapter.ra</entry>
-<entry key="dcNameRA">demo.echoadapter.ra</entry>
-<entry key="swcName">ZRSUGIO</entry>
-<entry key="raShortName">demo.echoadapter</entry>
-<entry key="dcNameWeb">demo.echoadapter.web</entry>
-<entry key="adapterNamespace">urn:demo</entry>
-<entry key="raCCIConnection">demoecho.CCIConnection</entry>
-<entry key="raDescription">Модель для сборки</entry>
-<entry key="dcNameLib">demo.echoadapter.lib</entry>
-<entry key="raSPIManagedConnectionFactory">demoecho.SPIManagedConnectionFactory</entry>
-<entry key="adapterVendorLocation">Russia, Moscow</entry>
+    <comment>Константы для сборки адаптера Echo из файла demoecho.EchoAdapterConstants</comment>
+    <entry key="raCCIConnectionFactory">demoecho.CCIConnectionFactory</entry>
+    <entry key="adapterVendor">rsug.io</entry>
+    <entry key="raEis">Без EIS (локальная обработка)</entry>
+    <entry key="webContextRoot">rsug.io~demoecho</entry>
+    <entry key="adapterType">Echo</entry>
+    <entry key="adapterVersion">1</entry>
+    <entry key="kolhoz">&#128229; Колхозная, им.тов.Гредлова, система сборки RAR/SDA. Ибо нефиг.</entry>
+    <entry key="jndi">deployedAdapters/demoecho.echoadapter.ra/shareademoechodemo.echoadapter.ra</entry>
+    <entry key="dcNameRA">demoecho.echoadapter.ra</entry>
+    <entry key="swcName">ZRSUGIO</entry>
+    <entry key="raShortName">demoecho.echoadapter</entry>
+    <entry key="dcNameWeb">demoecho.echoadapter.web</entry>
+    <entry key="adapterNamespace">urn:demo</entry>
+    <entry key="raCCIConnection">demoecho.CCIConnection</entry>
+    <entry key="raDescription">Модель для сборки</entry>
+    <entry key="dcNameLib">demoecho.echoadapter.lib</entry>
+    <entry key="raSPIManagedConnectionFactory">demoecho.SPIManagedConnectionFactory</entry>
+    <entry key="adapterVendorLocation">Russia, Moscow</entry>
 </properties>
 ```
 
@@ -134,9 +135,9 @@ EchoAdapterConstants.java при запуске `public static void main()` со
 
 ### buildSrc/src/main/java/Dependencies.java
 Сюда пишем все стандартные сап-зависимости, которые попадают в разные дескрипторы развёртывания:
-* rsug.io~demo.echoadapter.ra.rar/META-INF/connector-j2ee-engine.xml
-* rsug.io~demo.echoadapter.ra.sda/META-INF/application-j2ee-engine.xml
-* rsug.io~demo.echoadapter.web.sda/META-INF/application-j2ee-engine.xml
+* rsug.io~demoecho.echoadapter.ra.rar/META-INF/connector-j2ee-engine.xml
+* rsug.io~demoecho.echoadapter.ra.sda/META-INF/application-j2ee-engine.xml
+* rsug.io~demoecho.echoadapter.web.sda/META-INF/application-j2ee-engine.xml
 
 Собственные дополнительные зависимости пишем в задаче `sapSdaFromLibs` как:
 ```kotlin build.gradle.kts
@@ -151,16 +152,16 @@ EchoAdapterConstants.java при запуске `public static void main()` со
 * корневой build.gradle.kts вы один фиг будете править, доп.зависимости там органично указаны
 
 ### buildSrc/src/main/java/SdaFromLibs.java
-Собирает `rsug.io~demo.echoadapter.lib.sda` и сочиняет дескрипторы.
+Собирает `rsug.io~demoecho.echoadapter.lib.sda` и сочиняет дескрипторы.
 
 ### buildSrc/src/main/java/RarFromJar.java
-Собирает `rsug.io~demo.echoadapter.ra.rar` и пишет/копирует дескрипторы.
+Собирает `rsug.io~demoecho.echoadapter.ra.rar` и пишет/копирует дескрипторы.
 
 ### buildSrc/src/main/java/SdaFromRar.java
-Собирает `rsug.io~demo.echoadapter.ra.sda`, исходный rar не удаляет.
+Собирает `rsug.io~demoecho.echoadapter.ra.sda`, исходный rar не удаляет.
 
 ### buildSrc/src/main/java/SdaFromWar.java
-Собирает `rsug.io~demo.echoadapter.web.sda`, сочиняет дескрипторы.
+Собирает `rsug.io~demoecho.echoadapter.web.sda`, сочиняет дескрипторы.
 
 ### buildSrc/src/main/java/Sca.java
 Собирает `ZRSUGIO01_0.sca` из всех SDAшек в папке build, при этом считывает их SAP_MANIFEST.MF

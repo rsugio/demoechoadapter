@@ -6,9 +6,9 @@
 		<large-icon/>
 	</icon>
     <description>описание</description>
-	<application-name>demo.echoadapter.ra</application-name>
-	<display-name>demo.echoadapter.ra</display-name>
+	<application-name>demoecho.echoadapter.ra</application-name>
+	<display-name>demoecho.echoadapter.ra</display-name>
 	<module>
-		<connector>demo.echoadapter.ra.rar</connector>
+		<connector>demoecho.echoadapter.ra.rar</connector>
 	</module>
 </application>

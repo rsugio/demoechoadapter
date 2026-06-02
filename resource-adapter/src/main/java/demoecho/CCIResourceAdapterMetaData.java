@@ -5,7 +5,7 @@ public class CCIResourceAdapterMetaData implements ResourceAdapterMetaData {
     private static final XITrace TRACE = new XITrace(CCIResourceAdapterMetaData.class.getName());
     private String vendorName = EchoAdapterConstants.adapterVendor;
     private String adapterVersion = EchoAdapterConstants.adapterVersion;
-    private String specVersion = "1.0";
+    private String specVersion = "1.5";
     private String adapterName = EchoAdapterConstants.adapterType;
     private String description = EchoAdapterConstants.raDescription;
 
@@ -51,19 +51,19 @@ public class CCIResourceAdapterMetaData implements ResourceAdapterMetaData {
 
     public String[] getInteractionSpecsSupported() {
         String SIGNATURE = "CciConnection(SpiManagedConnection)";
-        TRACE.entering("CciConnection(SpiManagedConnection)");
+        TRACE.entering(SIGNATURE);
         String[] str = new String[1];
         str[0] = new String("com.sap.aii.af.ra.ms.cci.XiInteractionSpec");
-        TRACE.exiting("CciConnection(SpiManagedConnection)");
-        return str;
+        TRACE.exiting(SIGNATURE);
+        return new String[0];   //str was here
     }
 
     public boolean supportsExecuteWithInputAndOutputRecord() {
-        return true;
+        return false; // true;
     }
 
     public boolean supportsExecuteWithInputRecordOnly() {
-        return true;
+        return false; //true;
     }
 
     public boolean supportsLocalTransactionDemarcation() {

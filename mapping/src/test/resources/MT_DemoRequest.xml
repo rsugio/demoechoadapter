@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:MT_DemoRequest xmlns:x="urn:demo">
+    <node>123</node>
+</x:MT_DemoRequest>

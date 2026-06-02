@@ -77,6 +77,7 @@ public abstract class RarFromJar extends DefaultTask {
         atts.put(Attributes.Name.MANIFEST_VERSION, "1.0");
         atts.put(new Attributes.Name("keycounter"), keyCounter);
         atts.put(new Attributes.Name("deployfile"), "single-module-dd.xml");
+        atts.put(new Attributes.Name("csncomponent"), Objects.requireNonNull(props.getProperty("csncomponent")));
         manifest.write(zos);
         zos.closeEntry();
 

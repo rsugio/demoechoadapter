@@ -1,5 +1,7 @@
 package demoecho;
 
+//import demo.Dependencies;
+
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,7 +9,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 public class EchoAdapterConstants {
-    public static final String kolhoz = "\uD83D\uDCE5 Колхозная, им.тов.Гредлова, система сборки RAR/SDA. Ибо нефиг.";
+    public static final String kolhoz = "Echo";
     public static final String adapterType = "Echo";
     public static final String adapterNamespace = "urn:demo";
     public static final String adapterVendor = "rsug.io";
@@ -30,6 +32,13 @@ public class EchoAdapterConstants {
 
     // полный JNDI
     public final static String jndi = "deployedAdapters/" + dcNameRA + "/shareable/" + dcNameRA;
+    public final static String csncomponent = "ZDEMO";
+
+    // centralFileLogDirectory
+    // SYS_GLOBAL_DIR=/usr/sap/POD/SYS/global
+    // centralFileLogDirectory=$SYS_GLOBAL_DIR/xi_customer_logs/echoadapter
+    public final static String centralFileLogDirectorySuffix = "/xi_customer_logs/echoadapter";
+
 
     public static void main(String[] args) throws Exception {
         Properties props = new Properties();
@@ -51,6 +60,7 @@ public class EchoAdapterConstants {
         props.put("dcNameLib", dcNameLib);
         props.put("dcNameWeb", dcNameWeb);
         props.put("webContextRoot", webContextRoot);
+        props.put("csncomponent", csncomponent);
 
         Path whereTo = Paths.get("properties.xml");
         String comment = String.format("Константы для сборки адаптера %s из файла %s", adapterType, EchoAdapterConstants.class.getName());
