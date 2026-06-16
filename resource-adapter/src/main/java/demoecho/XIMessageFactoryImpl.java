@@ -3,43 +3,37 @@ package demoecho;
 
 import com.sap.aii.af.lib.ra.cci.XIMessageRecord;
 import com.sap.aii.af.lib.ra.cci.XIRecordFactory;
-import com.sap.engine.interfaces.messaging.api.AckType;
-import com.sap.engine.interfaces.messaging.api.Action;
-import com.sap.engine.interfaces.messaging.api.Message;
-import com.sap.engine.interfaces.messaging.api.MessageFactory;
-import com.sap.engine.interfaces.messaging.api.MessageKey;
-import com.sap.engine.interfaces.messaging.api.Party;
-import com.sap.engine.interfaces.messaging.api.PublicAPIAccessFactory;
-import com.sap.engine.interfaces.messaging.api.Service;
+import com.sap.engine.interfaces.messaging.api.*;
 import com.sap.engine.interfaces.messaging.api.ack.AckFactory;
 import com.sap.engine.interfaces.messaging.api.exception.MessagingException;
+
 import javax.resource.ResourceException;
 import javax.resource.cci.IndexedRecord;
 import javax.resource.cci.MappedRecord;
 
 public class XIMessageFactoryImpl implements XIRecordFactory {
-    private static final String AF_MSGFCT_TYPE = "XI";
+//    private static final String AF_MSGFCT_TYPE = "XI";
     private static final XITrace TRACE = new XITrace(XIMessageFactoryImpl.class.getName());
-    private MessageFactory mf = null;
-    private AckFactory af = null;
-    private String ackfct = null;
+    private final MessageFactory mf;
+    private final AckFactory af;
+    private final String ackfct;
 
     public XIMessageFactoryImpl(String adapterType, String adapterNamespace) throws ResourceException {
         String SIGNATURE = "XIMessageFactoryImpl(String adapterType, String adapterNamespace)";
-        TRACE.entering("XIMessageFactoryImpl(String adapterType, String adapterNamespace)", new Object[]{adapterType, adapterNamespace});
+        TRACE.entering(SIGNATURE, new Object[]{adapterType, adapterNamespace});
 
         try {
             this.mf = PublicAPIAccessFactory.getPublicAPIAccess().createMessageFactory("XI");
             this.af = PublicAPIAccessFactory.getPublicAPIAccess().createAckFactory();
             this.ackfct = adapterType + "_" + adapterNamespace;
-        } catch (Exception e) {
-            TRACE.catching("XIMessageFactoryImpl(String adapterType, String adapterNamespace)", e);
+        } catch (MessagingException e) {
+            TRACE.catching(SIGNATURE, e);
             ResourceException re = new ResourceException(e.getMessage());
-            TRACE.throwing("XIMessageFactoryImpl(String adapterType, String adapterNamespace)", re);
+            TRACE.throwing(SIGNATURE, re);
             throw re;
         }
 
-        TRACE.exiting("XIMessageFactoryImpl(String adapterType, String adapterNamespace)");
+        TRACE.exiting(SIGNATURE);
     }
 
     public Message createMessageRecord(String fromParty, String toParty, String fromService, String toService, String action, String actionNS) throws ResourceException {
@@ -125,7 +119,7 @@ public class XIMessageFactoryImpl implements XIRecordFactory {
     }
 
     public XIMessageRecord createXIMessageRecord() {
-        return new XIMessageRecordImpl((Message)null);
+        return new XIMessageRecordImpl((Message) null);
     }
 
     public void ackNotSupported(MessageKey messageKey, AckType[] acksNotSupported) throws MessagingException {

@@ -9,9 +9,11 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 public class EchoAdapterConstants {
-    public static final String kolhoz = "Echo";
+    public static final String kolhoz = "Васянская сборка";
     public static final String adapterType = "Echo";
     public static final String adapterNamespace = "urn:demo";
+    public static final String adapterThread = "EchoAdapter_";
+    public static final String adapterAddressMode = "CPA";
     public static final String adapterVendor = "rsug.io";
     public static final String adapterVendorLocation = "Russia, Moscow";
     public final static String adapterVersion = "1";         // должно совпадать с /AdapterTypeMetaData/@version
@@ -36,9 +38,37 @@ public class EchoAdapterConstants {
 
     // centralFileLogDirectory
     // SYS_GLOBAL_DIR=/usr/sap/POD/SYS/global
-    // centralFileLogDirectory=$SYS_GLOBAL_DIR/xi_customer_logs/echoadapter
-    public final static String centralFileLogDirectorySuffix = "/xi_customer_logs/echoadapter";
+    // centralFileLogDirectory=$SYS_GLOBAL_DIR/xi_customer_logs/adapter_Echo
+    public final static String centralFileLogDirectorySuffix = "/xi_customer_logs/adapter_Echo";
 
+    public final static String text64 = "text64";
+
+    public final static String adapterStatus = "adapterStatus";
+    public final static String adapterStatusActive = "active";
+    public final static String adapterStatusInactive = "inactive";
+
+    // Fault tab
+    public final static String throwFault = "throwFault";
+    public final static String throwNever = "never";
+    public final static String throwAlways = "always";
+    public final static String throwDynamicConfKey = "dynamicConf";
+    public final static String throwXPath = "xpath";
+    public final static String faultDynConfNS = "faultDynConfNS";
+    public final static String faultDynConfName = "faultDynConfName";
+    public final static String faultDynConfOperator = "faultDynConfOperator";
+    public final static String faultDynConfValue = "faultDynConfValue";
+
+    public final static String throwOperatorExist = "exist";
+    public final static String throwOperatorNexst = "notexist";
+    public final static String throwOperatorEqual = "equal";
+    public final static String throwOperatorNequal = "notequal";
+
+    public final static String faultMessageTypeNS = "faultMessageTypeNS";
+    public final static String faultMessageTypeName = "faultMessageTypeName";
+    public final static String faultErrorCategory = "faultErrorCategory";
+    public final static String faultErrorCode = "faultErrorCode";
+    public final static String faultErrorArea = "faultErrorArea";
+    public final static String faultAdditionalErrorText = "AdditionalErrorText";
 
     public static void main(String[] args) throws Exception {
         Properties props = new Properties();

@@ -3,32 +3,28 @@ package demoecho;
 
 import javax.resource.NotSupportedException;
 import javax.resource.ResourceException;
-import javax.resource.cci.Connection;
-import javax.resource.cci.ConnectionMetaData;
-import javax.resource.cci.Interaction;
-import javax.resource.cci.LocalTransaction;
-import javax.resource.cci.ResultSetInfo;
+import javax.resource.cci.*;
 import javax.resource.spi.IllegalStateException;
 
 public class CCIConnection implements Connection {
     private static final XITrace TRACE = new XITrace(CCIConnection.class.getName());
-    private SPIManagedConnection mc = null;
+    private SPIManagedConnection mc;
 
     CCIConnection(SPIManagedConnection mc) {
         String SIGNATURE = "CciConnection(SpiManagedConnection)";
-        TRACE.entering("CciConnection(SpiManagedConnection)", new Object[]{mc});
+        TRACE.entering(SIGNATURE, new Object[]{mc});
         this.mc = mc;
-        TRACE.exiting("CciConnection(SpiManagedConnection)");
+        TRACE.exiting(SIGNATURE);
     }
 
     public Interaction createInteraction() throws ResourceException {
         String SIGNATURE = "createInteraction()";
-        TRACE.entering("createInteraction()");
+        TRACE.entering(SIGNATURE);
         if (this.mc == null) {
             throw new ResourceException("Connection is invalid");
         } else {
             CCIInteraction interaction = new CCIInteraction(this);
-            TRACE.exiting("createInteraction()");
+            TRACE.exiting(SIGNATURE);
             return interaction;
         }
     }
@@ -43,61 +39,61 @@ public class CCIConnection implements Connection {
 
     public void close() throws ResourceException {
         String SIGNATURE = "close()";
-        TRACE.entering("close()");
+        TRACE.entering(SIGNATURE);
         if (this.mc != null) {
             this.mc.removeCciConnection(this);
             this.mc.sendEvent(1, (Exception) null, this);
             this.mc = null;
-            TRACE.exiting("close()");
+            TRACE.exiting(SIGNATURE);
         }
     }
 
     public ConnectionMetaData getMetaData() throws ResourceException {
         String SIGNATURE = "getMetaData()";
-        TRACE.entering("getMetaData()");
+        TRACE.entering(SIGNATURE);
         CCIConnectionMetaData cmd = new CCIConnectionMetaData(this.mc);
-        TRACE.exiting("getMetaData()");
+        TRACE.exiting(SIGNATURE);
         return cmd;
     }
 
     void associateConnection(SPIManagedConnection newMc) throws ResourceException {
         String SIGNATURE = "associateConnection(SPIManagedConnection newMc)";
-        TRACE.entering("associateConnection(SPIManagedConnection newMc)");
+        TRACE.entering(SIGNATURE);
 
         try {
             this.checkIfValid();
         } catch (ResourceException ex) {
-            TRACE.catching("associateConnection(SPIManagedConnection newMc)", ex);
+            TRACE.catching(SIGNATURE, ex);
             throw new IllegalStateException("Connection is invalid");
         }
 
         this.mc.removeCciConnection(this);
         newMc.addCciConnection(this);
         this.mc = newMc;
-        TRACE.exiting("associateConnection(SPIManagedConnection newMc)");
+        TRACE.exiting(SIGNATURE);
     }
 
     public SPIManagedConnection getManagedConnection() {
         String SIGNATURE = "getManagedConnection()";
-        TRACE.entering("getManagedConnection()");
-        TRACE.exiting("getManagedConnection()");
+        TRACE.entering(SIGNATURE);
+        TRACE.exiting(SIGNATURE);
         return this.mc;
     }
 
     void checkIfValid() throws ResourceException {
         String SIGNATURE = "checkIfValid()";
-        TRACE.entering("checkIfValid()");
+        TRACE.entering(SIGNATURE);
         if (this.mc == null) {
             throw new ResourceException("Connection is invalid");
         } else {
-            TRACE.exiting("checkIfValid()");
+            TRACE.exiting(SIGNATURE);
         }
     }
 
     void invalidate() {
         String SIGNATURE = "invalidate()";
-        TRACE.entering("invalidate()");
+        TRACE.entering(SIGNATURE);
         this.mc = null;
-        TRACE.exiting("invalidate()");
+        TRACE.exiting(SIGNATURE);
     }
 }

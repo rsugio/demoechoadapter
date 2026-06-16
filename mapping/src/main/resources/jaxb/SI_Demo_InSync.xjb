@@ -1,0 +1,16 @@
+﻿
+<jxb:bindings version="2.1" 
+              xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+              xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <jxb:bindings schemaLocation="SI_Demo_InSync.xsd">
+        <jxb:bindings node="//xsd:element[@name='MT_DemoRequest']">
+            <jxb:class name="MT_DemoRequest"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xsd:element[@name='MT_DemoResponse']">
+            <jxb:class name="MT_DemoResponse"/>
+        </jxb:bindings>
+    </jxb:bindings>
+
+</jxb:bindings>
+

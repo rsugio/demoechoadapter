@@ -1,0 +1,46 @@
+﻿     <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="urn:demo" targetNamespace="urn:demo">
+         <xsd:element name="MT_DemoResponse" type="DT_DemoResponse" />
+         <xsd:element name="FMT_Demo">
+            <xsd:complexType>
+               <xsd:sequence>
+                  <xsd:element name="standard" type="ExchangeFaultData" />
+                  <xsd:element name="addition" type="DT_Demo" />
+               </xsd:sequence>
+            </xsd:complexType>
+         </xsd:element>
+         <xsd:element name="MT_DemoRequest" type="DT_DemoRequest" />
+         <xsd:complexType name="ExchangeFaultData">
+            <xsd:sequence>
+               <xsd:element name="faultText" type="xsd:string" />
+               <xsd:element name="faultUrl" type="xsd:string" minOccurs="0" />
+               <xsd:element name="faultDetail" type="ExchangeLogData" minOccurs="0" maxOccurs="unbounded" />
+            </xsd:sequence>
+         </xsd:complexType>
+         <xsd:complexType name="DT_DemoRequest">
+            <xsd:sequence>
+               <xsd:element name="node" type="xsd:string" />
+            </xsd:sequence>
+         </xsd:complexType>
+         <xsd:complexType name="DT_DemoResponse">
+            <xsd:sequence>
+               <xsd:element name="number">
+                  <xsd:simpleType>
+                     <xsd:restriction base="xsd:integer">
+                        <xsd:totalDigits value="3" />
+                     </xsd:restriction>
+                  </xsd:simpleType>
+               </xsd:element>
+            </xsd:sequence>
+         </xsd:complexType>
+         <xsd:complexType name="DT_Demo">
+            <xsd:attribute name="string" type="xsd:string" />
+         </xsd:complexType>
+         <xsd:complexType name="ExchangeLogData">
+            <xsd:sequence>
+               <xsd:element name="severity" type="xsd:string" minOccurs="0" />
+               <xsd:element name="text" type="xsd:string" />
+               <xsd:element name="url" type="xsd:string" minOccurs="0" />
+               <xsd:element name="id" type="xsd:string" minOccurs="0" />
+            </xsd:sequence>
+         </xsd:complexType>
+      </xsd:schema>

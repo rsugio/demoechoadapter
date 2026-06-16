@@ -24,6 +24,78 @@
             <GuiLabels>
                 <Label language="EN">NoProtocol</Label>
             </GuiLabels>
+            <ChannelAttributes>
+                <Tab id="main">
+                    <AttributeGroup>
+                        <Name>main</Name>
+                        <GuiLabels>
+                            <Label language="EN">Sample attributes</Label>
+                        </GuiLabels>
+                        <AttributeReference>
+                            <ReferenceName>text64</ReferenceName>
+                        </AttributeReference>
+                    </AttributeGroup>
+                </Tab>
+                <Tab id="throwFault">
+                    <AttributeGroup>
+                        <Name>throwFault</Name>
+                        <GuiLabels>
+                            <Label language="EN">Fault behaviour</Label>
+                        </GuiLabels>
+                        <AttributeReference>
+                            <ReferenceName>throwFault</ReferenceName>
+                        </AttributeReference>
+                        <AttributeReference>
+                            <ReferenceName>faultDynConfNS</ReferenceName>
+                            <EditCondition>
+                                <AttributeName>throwFault</AttributeName>
+                                <AttributeValue>dynamicConf</AttributeValue>
+                            </EditCondition>
+                        </AttributeReference>
+                        <AttributeReference>
+                            <ReferenceName>faultDynConfName</ReferenceName>
+                            <EditCondition>
+                                <AttributeName>throwFault</AttributeName>
+                                <AttributeValue>dynamicConf</AttributeValue>
+                            </EditCondition>
+                        </AttributeReference>
+                        <AttributeReference>
+                            <ReferenceName>faultDynConfOperator</ReferenceName>
+                            <EditCondition>
+                                <AttributeName>throwFault</AttributeName>
+                                <AttributeValue>dynamicConf</AttributeValue>
+                            </EditCondition>
+                        </AttributeReference>
+                        <AttributeReference>
+                            <ReferenceName>faultDynConfValue</ReferenceName>
+                            <EditCondition>
+                                <AttributeName>faultDynConfOperator</AttributeName>
+                                <AttributeValue>equal</AttributeValue>
+                                <AttributeValue>notequal</AttributeValue>
+                            </EditCondition>
+                        </AttributeReference>
+                        <AttributeReference>
+                            <ReferenceName>faultMessageTypeNS</ReferenceName>
+                            <EditCondition>
+                                <AttributeName>throwFault</AttributeName>
+                                <AttributeValue>always</AttributeValue>
+                                <AttributeValue>dynamicConf</AttributeValue>
+                                <AttributeValue>xpath</AttributeValue>
+                            </EditCondition>
+                        </AttributeReference>
+                        <AttributeReference>
+                            <ReferenceName>faultMessageTypeName</ReferenceName>
+                            <EditCondition>
+                                <AttributeName>throwFault</AttributeName>
+                                <AttributeValue>always</AttributeValue>
+                                <AttributeValue>dynamicConf</AttributeValue>
+                                <AttributeValue>xpath</AttributeValue>
+                            </EditCondition>
+                        </AttributeReference>
+                    </AttributeGroup>
+                </Tab>
+            </ChannelAttributes>
+            <SecurityAttributes/>
             <ModuleProcessorAttributes>
                 <ModuleSequence>
                     <ModuleSequenceItem>
@@ -42,22 +114,16 @@
             </ModuleProcessorAttributes>
         </MessageProtocol>
         <GlobalChannelAttributes>
-            <Tab id="main">
+            <Tab id="advanced">
                 <AttributeReference>
                     <ReferenceName>adapterStatus</ReferenceName>
-                </AttributeReference>
-                <AttributeReference>
-                    <ReferenceName>text64</ReferenceName>
-                </AttributeReference>
-                <AttributeReference>
-                    <ReferenceName>throwFault</ReferenceName>
                 </AttributeReference>
             </Tab>
         </GlobalChannelAttributes>
     </Outbound>
     <Attribute isPassword="false">
         <Name>adapterStatus</Name>
-        <Usage>optional</Usage>
+        <Usage>required</Usage>
         <Default>active</Default>
         <DataType>xsd:string</DataType>
         <Length>0</Length>
@@ -95,7 +161,7 @@
         <DataType>xsd:string</DataType>
         <Length>0</Length>
         <GuiLabels>
-            <Label language="EN">Throw faults when ...</Label>
+            <Label language="EN">throwFault</Label>
         </GuiLabels>
         <FixedValue>
             <value>never</value>
@@ -110,10 +176,117 @@
             </GuiLabels>
         </FixedValue>
         <FixedValue>
-            <value>dynamicConfKey</value>
+            <value>dynamicConf</value>
             <GuiLabels>
-                <Label language="EN">dynamicConfKey</Label>
+                <Label language="EN">dynamicConf</Label>
+            </GuiLabels>
+        </FixedValue>
+        <FixedValue>
+            <value>xpath</value>
+            <GuiLabels>
+                <Label language="EN">xpath</Label>
             </GuiLabels>
         </FixedValue>
     </Attribute>
+    <Attribute isPassword="false">
+        <Name>faultDynConfNS</Name>
+        <Usage>optional</Usage>
+        <Flag>nonTransportable</Flag>
+        <DataType>xsd:string</DataType>
+        <Length>128</Length>
+        <GuiLabels>
+            <Label language="EN">faultDynConfNS</Label>
+        </GuiLabels>
+    </Attribute>
+    <Attribute isPassword="false">
+        <Name>faultDynConfName</Name>
+        <Usage>optional</Usage>
+        <Flag>nonTransportable</Flag>
+        <DataType>xsd:string</DataType>
+        <Length>128</Length>
+        <GuiLabels>
+            <Label language="EN">faultDynConfName</Label>
+        </GuiLabels>
+    </Attribute>
+    <Attribute isPassword="false">
+        <Name>faultDynConfOperator</Name>
+        <Usage>required</Usage>
+        <Default>exist</Default>
+        <DataType>xsd:string</DataType>
+        <Length>0</Length>
+        <GuiLabels>
+            <Label language="EN">faultDynConfOperator</Label>
+        </GuiLabels>
+        <FixedValue>
+            <value>exist</value>
+            <GuiLabels>
+                <Label language="EN">exist</Label>
+            </GuiLabels>
+        </FixedValue>
+        <FixedValue>
+            <value>notexist</value>
+            <GuiLabels>
+                <Label language="EN">notexist</Label>
+            </GuiLabels>
+        </FixedValue>
+        <FixedValue>
+            <value>equal</value>
+            <GuiLabels>
+                <Label language="EN">equal</Label>
+            </GuiLabels>
+        </FixedValue>
+        <FixedValue>
+            <value>notequal</value>
+            <GuiLabels>
+                <Label language="EN">notequal</Label>
+            </GuiLabels>
+        </FixedValue>
+    </Attribute>
+    <Attribute isPassword="false">
+        <Name>faultDynConfValue</Name>
+        <Usage>optional</Usage>
+        <Flag>nonTransportable</Flag>
+        <DataType>xsd:string</DataType>
+        <Length>128</Length>
+        <GuiLabels>
+            <Label language="EN">faultDynConfValue</Label>
+        </GuiLabels>
+    </Attribute>
+    <Attribute isPassword="false">
+        <Name>faultMessageTypeNS</Name>
+        <Usage>optional</Usage>
+        <Flag>nonTransportable</Flag>
+        <Default>default value</Default>
+        <DataType>xsd:string</DataType>
+        <Length>128</Length>
+        <GuiLabels>
+            <Label language="EN">faultMessageTypeNS</Label>
+        </GuiLabels>
+    </Attribute>
+    <Attribute isPassword="false">
+        <Name>faultMessageTypeName</Name>
+        <Usage>optional</Usage>
+        <Flag>nonTransportable</Flag>
+        <Default>default value</Default>
+        <DataType>xsd:string</DataType>
+        <Length>128</Length>
+        <GuiLabels>
+            <Label language="EN">faultMessageTypeName</Label>
+        </GuiLabels>
+    </Attribute>
+    <TabDefinition id="main">
+        <GuiLabels>
+            <Label language="EN">main</Label>
+        </GuiLabels>
+    </TabDefinition>
+    <TabDefinition id="throwFault">
+        <GuiLabels>
+            <Label language="EN">throwFault</Label>
+        </GuiLabels>
+    </TabDefinition>
+    <TabDefinition id="advanced">
+        <GuiLabels>
+            <Label language="EN">advanced</Label>
+        </GuiLabels>
+    </TabDefinition>
 </AdapterTypeMetaData>

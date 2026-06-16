@@ -26,6 +26,7 @@ dependencies {
     implementation("javax.resource:connector-api:1.5")    // см.connector.jar из ./libs
 //    compileOnly(":common")
 
+    testImplementation("io.rsug:komar:0.0.1")
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

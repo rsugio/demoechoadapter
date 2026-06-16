@@ -1,5 +1,6 @@
 plugins {
-    id("java")
+    `java-gradle-plugin`
+    `kotlin-dsl`  // если нужна поддержка Kotlin в buildSrc
 }
 
 group = "demo"

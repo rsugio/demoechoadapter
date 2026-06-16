@@ -10,5 +10,11 @@ public class AdapterTests {
 //        SPIManagedConnectionFactory mcf = new SPIManagedConnectionFactory();
 //        mcf.setAdapterType(EchoAdapterConstants.adapterType);
 //        mcf.setAdapterNamespace(EchoAdapterConstants.adapterNamespace);
+        if ("false".equals("true")) {
+            SPIManagedConnectionFactory spimcf = new SPIManagedConnectionFactory();
+            spimcf.setAdapterType(EchoAdapterConstants.adapterType);
+            spimcf.setAdapterNamespace(EchoAdapterConstants.adapterNamespace);
+            new XIConfiguration(EchoAdapterConstants.adapterType, EchoAdapterConstants.adapterNamespace);
+        }
     }
 }

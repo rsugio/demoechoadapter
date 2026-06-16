@@ -59,11 +59,11 @@ public class CCIResourceAdapterMetaData implements ResourceAdapterMetaData {
     }
 
     public boolean supportsExecuteWithInputAndOutputRecord() {
-        return false; // true;
+        return false;
     }
 
     public boolean supportsExecuteWithInputRecordOnly() {
-        return false; //true;
+        return true;
     }
 
     public boolean supportsLocalTransactionDemarcation() {

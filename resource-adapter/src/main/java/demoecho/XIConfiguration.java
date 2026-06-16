@@ -10,68 +10,60 @@ import com.sap.aii.af.service.administration.api.cpa.ChannelLifecycleCallback;
 import com.sap.aii.af.service.administration.api.i18n.LocalizationCallback;
 import com.sap.aii.af.service.administration.api.i18n.LocalizationNotPossibleException;
 import com.sap.aii.af.service.administration.api.monitoring.*;
-import com.sap.aii.af.service.administration.monitoring.Adapter;
-import com.sap.aii.af.service.administration.monitoring.MonitoringAdapterAdminManagerFactory;
-import com.sap.aii.af.service.cpa.*;
-import com.sap.aii.af.service.util.adapterstatus.AAMStatusMonitor;
+import com.sap.aii.af.service.cpa.Channel;
+import com.sap.aii.af.service.cpa.Direction;
 import com.sap.aii.utilxi.rtcheck.base.SingleTestResult;
 import com.sap.aii.utilxi.rtcheck.base.TestResult;
 import com.sap.aii.utilxi.rtcheck.base.TestSuitResult;
 import com.sap.engine.services.configuration.appconfiguration.ApplicationPropertiesAccess;
 
-import javax.naming.InitialContext;
 import javax.resource.ResourceException;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Locale;
-import java.util.Properties;
+import java.util.Objects;
+import java.util.Optional;
 
-public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusCallback, LocalizationCallback, ChannelSelfTestCallback {
+public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusCallback, LocalizationCallback, ChannelSelfTestCallback, Serializable {
     private static final XITrace TRACE = new XITrace(XIConfiguration.class.getName());
-    public static final String ADAPTER_TYPE = EchoAdapterConstants.adapterType;
-    public static final String ADAPTER_NAMESPACE = EchoAdapterConstants.adapterNamespace;
-    private String adapterType;
-    private String adapterNamespace;
-    private LinkedList<Channel> outboundChannels;
-    //    private LinkedList<Channel> inboundChannels;
-    private CPALookupManager lookupManager;
-    private AdapterRegistry adapterRegistry;
-    private LocalizationCallback localizer;
-    private PartyChangeCallBackHandler partyChangeCallBackHandler;
-    private SPIManagedConnectionFactory mcf;
+
+    //    private final String adapterType = EchoAdapterConstants.adapterType;
+//    private final String adapterNamespace = EchoAdapterConstants.adapterNamespace;
+    private final LinkedList<Channel> channels = new LinkedList<>();
+
+    CPAFactory cpaFactory;
+    CPALookupManager lookupManager;
+    AdapterRegistry adapterRegistry;
+    LocalizationCallback localizer;
+    //    PartyChangeCallBackHandler partyChangeCallBackHandler;
+    SPIManagedConnectionFactory mcf;
 
     // из коммуникационного канала:
-    private String text64 = null, adapterStatus = null, throwFault;
+//    ChannelProperties channelProperties = new ChannelProperties();
     // из пропертей
-//    final PropertyConfiguration propertyListener = new PropertyConfiguration();
-    ApplicationPropertiesAccess applicationConfiguration = null;
     String centralFileLogDirectory = null;
+    //    final PropertyConfiguration propertyListener = new PropertyConfiguration();
+    ApplicationPropertiesAccess applicationConfiguration = null;
 
-    public XIConfiguration() {
-        this(ADAPTER_TYPE, ADAPTER_NAMESPACE);
-    }
-
-    public XIConfiguration(String adapterType, String adapterNamespace) {
+    XIConfiguration(String adapterType, String adapterNamespace) {
         String SIGNATURE = "XIConfiguration(String adapterType, String adapterNamespace)";
         TRACE.entering(SIGNATURE, new Object[]{adapterType, adapterNamespace});
-        this.outboundChannels = null;
-        this.lookupManager = null;
-        this.adapterRegistry = null;
-        this.localizer = null;
-        this.partyChangeCallBackHandler = null;
-        this.mcf = null;
-        this.adapterType = adapterType;
-        this.adapterNamespace = adapterNamespace;
+//        this.adapterRegistry = null;
+//        this.localizer = null;
+//        this.mcf = null;
+//        this.adapterType = adapterType;
+//        this.adapterNamespace = adapterNamespace;
 
         try {
-            CPAFactory cf = CPAFactory.getInstance();
-            this.lookupManager = cf.getLookupManager();
-            this.partyChangeCallBackHandler = PartyChangeCallBackHandler.getInstance();
-            MonitoringAdapterAdminManagerFactory maamf = MonitoringAdapterAdminManagerFactory.getInstance();
-            Adapter[] s = maamf.getMonitoringAdapterRegistry().getRegistetredAdapters();
-            TRACE.warningT(SIGNATURE, "{}", maamf.getSchedulingManager().getAllSchedules());
-            AAMStatusMonitor aamStatusMonitor = new AAMStatusMonitor(null);
-            TRACE.warningT(SIGNATURE, aamStatusMonitor.toString());
-            aamStatusMonitor.reportMessageProcessed(null);
+            this.cpaFactory = CPAFactory.getInstance();
+            this.lookupManager = this.cpaFactory.getLookupManager();
+//            this.partyChangeCallBackHandler = PartyChangeCallBackHandler.getInstance();
+//            MonitoringAdapterAdminManagerFactory maamf = MonitoringAdapterAdminManagerFactory.getInstance();
+//            Adapter[] s = maamf.getMonitoringAdapterRegistry().getRegistetredAdapters();
+//            TRACE.warningT(SIGNATURE, "{}", maamf.getSchedulingManager().getAllSchedules());
+//            AAMStatusMonitor aamStatusMonitor = new AAMStatusMonitor(null);
+//            TRACE.warningT(SIGNATURE, aamStatusMonitor.toString());
+//            aamStatusMonitor.reportMessageProcessed(null);
         } catch (Exception e) {
             TRACE.catching(SIGNATURE, e);
             TRACE.errorT(SIGNATURE, XIAdapterCategories.CONFIG, "SOA.apt_sample.0040", "CPALookupManager cannot be instantiated due to {0}", e.getMessage());
@@ -81,121 +73,65 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
         TRACE.exiting(SIGNATURE);
     }
 
+    // ChannelLifecycleCallback
+    @Override
     public void channelAdded(Channel channel) {
         String SIGNATURE = "channelAdded(Channel channel)";
         TRACE.entering(SIGNATURE, new Object[]{channel});
-
-        synchronized (this) {
-            if (channel.getDirection() == Direction.INBOUND) {
-//                this.inboundChannels.add(channel);
-//
-//                try {
-//                    dir = channel.getValueAsString("fileInDir");
-//                    name = channel.getValueAsString("fileInName");
-//                } catch (Exception e) {
-//                    TRACE.catching("channelAdded(Channel channel)", e);
-//                    TRACE.errorT("channelAdded(Channel channel)", XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0042", "Channel configuration value cannot be read due to {0}", new Object[]{e.getMessage()});
-//                }
-            } else if (channel.getDirection() == Direction.OUTBOUND) {
-                this.outboundChannels.add(channel);
-
-                try {
-                    readChannelAttributes(channel);
-//                    text64 = channel.getValueAsString("text64");
-//                    adapterStatus = channel.getValueAsString("adapterStatus");
-                } catch (Exception e) {
-                    TRACE.catching(SIGNATURE, e);
-                    TRACE.errorT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0043", "Channel configuration value cannot be read due to {0}", e.getMessage());
-                }
-            }
-
-            try {
-                PartyCallBackController.getInstance().registerForPartyEvent(channel.getParty(), this.partyChangeCallBackHandler);
-                Party party = NormalizationManager.getInstance().getXIParty("http://sap.com/xi/XI", "XIParty", channel.getParty());
-
-                for (PartyIdentifier partyIdentifier : this.lookupManager.getPartyIdentifiersByParty(party)) {
-                    String schema = partyIdentifier.getPartySchema();
-                    if (schema.equals("DUNS")) {
-                        this.partyChangeCallBackHandler.addParty(channel.getParty(), partyIdentifier.getPartyIdentifier());
-                    }
-                }
-            } catch (Exception e) {
-                TRACE.catching(SIGNATURE, e);
-                TRACE.errorT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0044", "Party Cannot be registered for Callback due to {0}", new Object[]{e.getMessage()});
-            }
+        Objects.requireNonNull(channel);
+        synchronized (channels) {
+            //TODO Party
+            channels.add(channel);
         }
-
-        TRACE.infoT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "Channel with ID {0} for party {1} and service {2} added (direction is {3}).", new Object[]{channel.getObjectId(), channel.getParty(), channel.getService(), channel.getDirection().toString()});
-        TRACE.exiting(SIGNATURE);
+//        TRACE.infoT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "Channel with ID {0} for party {1} and service {2} added (direction is {3}).", new Object[]{channel.getObjectId(), channel.getParty(), channel.getService(), channel.getDirection().toString()});
+//        TRACE.exiting(SIGNATURE);
     }
 
+    @Override
     public void channelUpdated(Channel channel) {
         String SIGNATURE = "channelUpdated(Channel channel)";
-        TRACE.entering(SIGNATURE);
-        try {
-            readChannelAttributes(channel);
-        } catch (Exception e) {
-            TRACE.catching(SIGNATURE, e);
-            TRACE.errorT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0043", "Channel configuration value cannot be read due to {0}", e.getMessage());
-        }
-//        this.channelRemoved(channel);
-//        this.channelAdded(channel);
-        TRACE.exiting(SIGNATURE);
+        TRACE.entering(SIGNATURE, new Object[]{channel});
+        Objects.requireNonNull(channel);
+        this.channelRemoved(channel);
+        this.channelAdded(channel);
     }
 
+    @Override
     public void channelRemoved(Channel channel) {
         String SIGNATURE = "channelRemoved(Channel channel)";
         TRACE.entering(SIGNATURE, new Object[]{channel});
-        LinkedList<Channel> channels = null;
-        TRACE.infoT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "Channel with ID {0} for party {1} and service {2} will be removed now. (direction is {3}).", new Object[]{channel.getObjectId(), channel.getParty(), channel.getService(), channel.getDirection().toString()});
-        String channelID = channel.getObjectId();
-        if (channel.getDirection() == Direction.INBOUND) {
-//            channels = this.inboundChannels;
-        } else {
-            channels = this.outboundChannels;
-        }
+        String channelID = Objects.requireNonNull(channel).getObjectId();
+//        TRACE.debugT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "Channel with ID {0} for party {1} and service {2} will be removed now. (direction is {3}).", new Object[]{channel.getObjectId(), channel.getParty(), channel.getService(), channel.getDirection().toString()});
+//        try {
+//            //PartyCallBackController.getInstance().unregisterForPartyEvent(channel.getParty(), this.partyChangeCallBackHandler);
+//            //this.partyChangeCallBackHandler.removeParty(channel.getParty());
+//        } catch (Exception e) {
+//            TRACE.catching(SIGNATURE, e);
+//            TRACE.errorT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0045", "Party Cannot be unregistered for Callback due to {0}", new Object[]{e.getMessage()});
+//        }
 
-        try {
-            PartyCallBackController.getInstance().unregisterForPartyEvent(channel.getParty(), this.partyChangeCallBackHandler);
-            this.partyChangeCallBackHandler.removeParty(channel.getParty());
-        } catch (Exception e) {
-            TRACE.catching(SIGNATURE, e);
-            TRACE.errorT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "SOA.apt_sample.0045", "Party Cannot be unregistered for Callback due to {0}", new Object[]{e.getMessage()});
-        }
-
-        synchronized (this) {
-            for (int i = 0; i < channels.size(); ++i) {
-                Channel storedChannel = channels.get(i);
-                if (storedChannel.getObjectId().equalsIgnoreCase(channelID)) {
-                    channels.remove(i);
-                    if (channel.getDirection() == Direction.OUTBOUND) {
-                        try {
-                            this.mcf.destroyManagedConnection(channelID);
-                        } catch (Exception e) {
-                            TRACE.catching(SIGNATURE, e);
-                            TRACE.warningT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "The ManagedConnection for channel {0} cannot be destroyed. Configuration update might not work.", new Object[]{channelID});
-                        }
-                    }
-                    break;
-                }
+        Optional<Channel> storedChannel = channels.stream()
+                .filter(x -> x.getObjectId().equals(channelID))
+                .findFirst();
+        if (storedChannel.isPresent())
+            synchronized (channels) {
+                channels.remove(storedChannel.get());
+                mcf.destroyManagedConnection(channelID);
             }
-        }
-
-        TRACE.exiting("channelRemoved(Channel channel)");
+        TRACE.exiting(SIGNATURE);
     }
 
     public void init(SPIManagedConnectionFactory mcf) throws ResourceException {
         String SIGNATURE = "init(mcf)";
         TRACE.entering(SIGNATURE);
-//        String dir = null;
-//        String name = null;
         this.mcf = mcf;
 
         try {
             this.localizer = XILocalizationUtilities.getLocalizationCallback();
             AdapterRegistryFactory arf = AdapterRegistryFactory.getInstance();
             this.adapterRegistry = arf.getAdapterRegistry();
-            this.adapterRegistry.registerAdapter(this.adapterNamespace, this.adapterType, new AdapterCapability[]{AdapterCapability.PUSH_PROCESS_STATUS}, new AdapterCallback[]{this});
+            this.adapterRegistry.registerAdapter(EchoAdapterConstants.adapterNamespace, EchoAdapterConstants.adapterType,
+                    new AdapterCapability[]{AdapterCapability.PUSH_PROCESS_STATUS}, new AdapterCallback[]{this});
         } catch (Exception e) {
             TRACE.catching(SIGNATURE, e);
             ResourceException re = new ResourceException("XI AAM registration failed due to: " + e.getMessage());
@@ -203,33 +139,12 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
             throw re;
         }
 
-        synchronized (this) {
-//            this.inboundChannels = new LinkedList();
-            this.outboundChannels = new LinkedList<>();
+        synchronized (channels) {
+            channels.clear();
 
             try {
-                LinkedList<Channel> allChannels = this.lookupManager.getChannelsByAdapterType(this.adapterType, this.adapterNamespace);
-                TRACE.debugT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "The XI AAM service returned {0} channels for adapter type {1} with namespace {2}", new Object[]{allChannels.size(), this.adapterType, this.adapterNamespace});
-
-                for (int i = 0; i < allChannels.size(); ++i) {
-                    Channel channel = (Channel) allChannels.get(i);
-                    if (channel.getDirection() == Direction.INBOUND) {
-//                        this.inboundChannels.add(channel);
-//                        dir = channel.getValueAsString("fileInDir");
-//                        name = channel.getValueAsString("fileInName");
-                    } else {
-                        if (channel.getDirection() != Direction.OUTBOUND) {
-                            continue;
-                        }
-
-                        this.outboundChannels.add(channel);
-                        readChannelAttributes(channel);
-//                        dir = channel.getValueAsString("fileOutDir");
-//                        name = channel.getValueAsString("fileOutPrefix");
-                    }
-
-                    TRACE.infoT(SIGNATURE, XIAdapterCategories.CONNECT_AF, "Channel with ID {0} for party {1} and service {2} added (direction is {3}).", new Object[]{channel.getObjectId(), channel.getParty(), channel.getService(), channel.getDirection().toString()});
-                }
+                LinkedList<Channel> allChannels = this.lookupManager.getChannelsByAdapterType(EchoAdapterConstants.adapterType, EchoAdapterConstants.adapterNamespace);
+                channels.addAll(allChannels);
             } catch (Exception e) {
                 TRACE.catching(SIGNATURE, e);
                 ResourceException re = new ResourceException("XI CPA lookup failed due to: " + e.getMessage());
@@ -246,17 +161,17 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
         TRACE.entering(SIGNATURE);
 
         try {
-            try {
-                for (String partyName : this.partyChangeCallBackHandler.getRegisteredParties()) {
-                    PartyCallBackController.getInstance().unregisterForPartyEvent(partyName, this.partyChangeCallBackHandler);
-                }
+//            try {
+//                for (String partyName : this.partyChangeCallBackHandler.getRegisteredParties()) {
+//                    PartyCallBackController.getInstance().unregisterForPartyEvent(partyName, this.partyChangeCallBackHandler);
+//                }
+//
+//                this.partyChangeCallBackHandler.clear();
+//            } catch (CPAException e) {
+//                TRACE.catching(SIGNATURE, e);
+//            }
 
-                this.partyChangeCallBackHandler.clear();
-            } catch (CPAException e) {
-                TRACE.catching(SIGNATURE, e);
-            }
-
-            this.adapterRegistry.unregisterAdapter(this.adapterNamespace, this.adapterType);
+            this.adapterRegistry.unregisterAdapter(EchoAdapterConstants.adapterNamespace, EchoAdapterConstants.adapterType);
         } catch (Exception e) {
             TRACE.catching(SIGNATURE, e);
             ResourceException re = new ResourceException("XI AAM unregistration failed due to: " + e.getMessage());
@@ -284,7 +199,7 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
                     throw re;
                 }
 
-                out = (LinkedList) this.outboundChannels.clone();
+                out = (LinkedList) this.channels.clone();
             }
 
             return out;
@@ -313,7 +228,7 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
             channelID = channel.getObjectId();
             LinkedList<Channel> channels = new LinkedList<>();
             if (channel.getDirection() == Direction.OUTBOUND) {
-                channels = this.outboundChannels;
+                channels = this.channels;
             }
 
             synchronized (this) {
@@ -346,7 +261,7 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
             } else {
                 try {
                     if (storedChannel.getDirection() == Direction.OUTBOUND) {
-                        readChannelAttributes(channel);
+//                        readChannelAttributes(channel);
                         String directory = "."; // channel.getValueAsString("fileOutDir");
                         if (directory == null || directory.length() == 0) {
                             cs = csf.createChannelStatus(channel, ChannelState.ERROR, "Output file directory name is not set.");
@@ -376,76 +291,24 @@ public class XIConfiguration implements ChannelLifecycleCallback, ChannelStatusC
         }
     }
 
+    @Override
     public String localizeString(String str, Locale locale) throws LocalizationNotPossibleException {
         return this.localizer.localizeString(str, locale);
     }
 
     @Override
-    public com.sap.aii.utilxi.rtcheck.base.TestSuitResult testChannel(Channel channel, Locale locale) {
+    public TestSuitResult testChannel(Channel channel, Locale locale) {
         String SIGNATURE = "testChannel(Channel channel, Locale locale)";
         TRACE.entering(SIGNATURE, new Object[]{channel, locale});
         TestSuitResult tsr = new TestSuitResult();
         tsr.setOverallResult(2);
-        TestResult tr = new SingleTestResult(2, "text64", text64);
-        tsr.addTestResult(tr);
-        tr = new SingleTestResult(2, "adapterStatus", adapterStatus);
+        ChannelProperties cprop = new ChannelProperties();
+        cprop.readChannelAttributes(channel);
+        TestResult tr = new SingleTestResult(2, "properties", cprop.toString());
         tsr.addTestResult(tr);
         tr = new SingleTestResult(2, "centralFileLogDirectory", centralFileLogDirectory);
         tsr.addTestResult(tr);
-        tr = new SingleTestResult(2, "throwFault", throwFault);
-        tsr.addTestResult(tr);
         return tsr;
     }
-
-    //TODO сделать имена параметров из EchoAdapterConstants
-    private void readChannelAttributes(Channel channel) throws CPAException {
-        text64 = channel.getValueAsString("text64");
-        adapterStatus = channel.getValueAsString("adapterStatus");
-        throwFault = channel.getValueAsString("throwFault");
-        if (applicationConfiguration == null) {
-            try {
-                InitialContext ctx = new InitialContext();
-                applicationConfiguration = (ApplicationPropertiesAccess) ctx.lookup("ApplicationConfiguration");
-//                if (applicationConfiguration != null) {
-//                    applicationConfiguration.addApplicationPropertiesChangedListener(propertyListener);
-//                }
-            } catch (Exception e) {
-            }
-        }
-
-        if (applicationConfiguration != null && centralFileLogDirectory == null) {
-            Properties application = applicationConfiguration.getApplicationProperties();
-            Properties system = applicationConfiguration.getSystemProfile();
-            if (application != null && application.containsKey("centralFileLogDirectory")) {
-                centralFileLogDirectory = application.getProperty("centralFileLogDirectory");
-            } else if (system != null) {
-                // SYS_GLOBAL_DIR=/usr/sap/JXD/SYS/global
-                // centralFileLogDirectory=$SYS_GLOBAL_DIR/xi_customer_logs/echoadapter
-                centralFileLogDirectory = system.getProperty("SYS_GLOBAL_DIR") + EchoAdapterConstants.centralFileLogDirectorySuffix;
-            }
-        }
-    }
-
-//    class PropertyConfiguration implements ApplicationPropertiesChangeListener {
-//        private PropertyConfiguration() {
-//        }
-//        public void propertiesChanged() {
-//            try {
-//                InitialContext ctx = new InitialContext();
-//                ApplicationPropertiesAccess applicationConfiguration = (ApplicationPropertiesAccess) ctx.lookup("ApplicationConfiguration");
-//                if (applicationConfiguration != null) {
-//                    Properties application = applicationConfiguration.getApplicationProperties();
-//                    if (application != null) {
-//                        centralFileLogDirectory = "####### " + application + " #######";
-//                    } else {
-//                        centralFileLogDirectory = "# null (no application properties found) #";
-//                    }
-//                }
-//            } catch (Exception e) {
-//            }
-//            //            ApplicationConfiguration.updateProperties();
-////            ODataHelpServiceRegistration.registerHelpService();
-//        }
-//    }
 
 }

@@ -23,19 +23,19 @@ public class XIMessageRecordImpl implements XIMessageRecord {
 
     private void accessMessageFactory() throws ResourceException {
         String SIGNATURE = "accessMessageFactory()";
-        TRACE.entering("accessMessageFactory()");
+        TRACE.entering(SIGNATURE);
 
         try {
             this.pubAPI = PublicAPIAccessFactory.getPublicAPIAccess();
             this.mf = this.pubAPI.createMessageFactory("XI");
         } catch (Exception e) {
-            TRACE.catching("accessMessageFactory()", e);
+            TRACE.catching(SIGNATURE, e);
             ResourceException re = new ResourceException(e.getMessage());
-            TRACE.throwing("accessMessageFactory()", re);
+            TRACE.throwing(SIGNATURE, re);
             throw re;
         }
 
-        TRACE.exiting("accessMessageFactory()");
+        TRACE.exiting(SIGNATURE);
     }
 
     public XIMessageRecordImpl(Party fromParty, Party toParty, Service fromService, Service toService, Action action) throws ResourceException {
@@ -93,7 +93,7 @@ public class XIMessageRecordImpl implements XIMessageRecord {
 
     public Object clone() throws CloneNotSupportedException {
         String SIGNATURE = "clone()";
-        TRACE.entering("clone()");
+        TRACE.entering(SIGNATURE);
         XIMessageRecordImpl cloned = null;
 
         try {
@@ -106,9 +106,9 @@ public class XIMessageRecordImpl implements XIMessageRecord {
             cloned.setRecordName(this.getRecordName());
             cloned.setRecordShortDescription(this.getRecordShortDescription());
         } catch (Exception e) {
-            TRACE.catching("clone()", e);
+            TRACE.catching(SIGNATURE, e);
             CloneNotSupportedException ce = new CloneNotSupportedException(e.getMessage());
-            TRACE.throwing("clone()", ce);
+            TRACE.throwing(SIGNATURE, ce);
             throw ce;
         }
 
