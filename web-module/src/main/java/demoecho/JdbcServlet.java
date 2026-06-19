@@ -58,19 +58,26 @@ public class JdbcServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (initException != null) {
-            resp.sendError(500);
             PrintWriter pw = new PrintWriter(resp.getOutputStream());
             resp.setContentType("text/plain; charset=utf-8");
             pw.printf("Cannot work. Initialization error: %s", initException.getMessage());
             pw.close();
+            resp.sendError(500);
             return;
         }
         PrintWriter pw = new PrintWriter(resp.getOutputStream());
         resp.setContentType("text/plain; charset=utf-8");
         pw.println(JdbcServlet.class.getName());
         pw.println(conn);
+
         try {
-            mysql(pw);
+            String vendor = getVendor(conn);
+            pw.println("Vendor: " + vendor);
+            switch (vendor) {
+                case "MySQL": mysql(pw); break;
+                case "MariaDB": mariadb(pw); break;
+                default: pw.println("Not implemented for this vendor");
+            }
         } catch (Exception e) {
             e.printStackTrace(pw);
         }
@@ -116,7 +123,60 @@ public class JdbcServlet extends HttpServlet {
             executeStatement(pw, conn.prepareStatement(s));
             pw.println();
         }
-        ResultSet rs = conn.prepareCall(tables).executeQuery();
+        ResultSet rs = conn.prepareStatement(tables).executeQuery();
+        while (rs.next()) {
+            String tableSchema = rs.getString(1);
+            String tableName = rs.getString(2);
+            String s = "SELECT * FROM " + tableSchema + "." + tableName + " LIMIT 100";
+            pw.println(s);
+            try {
+                executeStatement(pw, conn.prepareStatement(s));
+            } catch (SQLException e) {
+                pw.println(e.getMessage());
+            }
+            pw.println();
+        }
+    }
+
+    void mariadb(PrintWriter pw) throws SQLException {
+        String tables = "-- Кастомные таблицы/вьюхи \n" +
+                "SELECT table_schema,\n" +
+                "    table_name,\n" +
+                "    table_type,  -- 'BASE TABLE' или 'VIEW'\n" +
+                "    table_rows,\n" +
+                "    update_time,\n" +
+                "    table_comment\n" +
+                "FROM information_schema.tables\n" +
+                "WHERE table_schema <> 'information_schema'\n" +
+                "ORDER BY table_schema, table_type, table_name;";
+        String fields = "-- Структура таблицы (колонки, типы, ключи)\n" +
+                "SELECT table_name, ordinal_position, \n" +
+                "    column_name,\n" +
+                "    data_type,\n" +
+                "    column_type,\n" +
+                "    is_nullable,\n" +
+                "    column_default,\n" +
+                "    column_key,  -- PRI = первичный ключ, MUL = внешний/индекс\n" +
+                "    extra,\n" +
+                "    character_maximum_length,\n" +
+                "    numeric_precision,\n" +
+                "    numeric_scale,\n" +
+                "    column_comment\n" +
+                "FROM information_schema.columns\n" +
+                "WHERE table_schema <> 'information_schema'\n" +
+                "ORDER BY table_schema, table_name, ordinal_position;";
+        String[] queries = {"SELECT VERSION()",
+                "SHOW DATABASES",
+                tables,
+                fields,
+                "SHOW STATUS",
+                "SHOW VARIABLES",};
+        for (String s: queries) {
+            pw.println(s);
+            executeStatement(pw, conn.prepareStatement(s));
+            pw.println();
+        }
+        ResultSet rs = conn.prepareStatement(tables).executeQuery();
         while (rs.next()) {
             String tableSchema = rs.getString(1);
             String tableName = rs.getString(2);
@@ -188,6 +248,10 @@ public class JdbcServlet extends HttpServlet {
                 List<String> row = new ArrayList<>();
                 for (int i = 1; i <= columnCount; i++) {
                     String value = getStringValue(rs, i, metaData.getColumnType(i));
+                    value = value
+                            .replace('\n', ' ')
+                            .replace('\r', ' ')
+                            .trim();
                     row.add(value);
                     // Обновляем максимальную ширину столбца
                     int currentWidth = columnWidths.get(i - 1);
@@ -311,5 +375,83 @@ public class JdbcServlet extends HttpServlet {
             sb.append(' ');
         }
         return sb.toString();
+    }
+
+    public String getVendor(Connection conn) throws SQLException {
+        if (conn == null) {
+            throw new SQLException("Connection is null");
+        }
+
+        DatabaseMetaData metaData = conn.getMetaData();
+        String productName = metaData.getDatabaseProductName().toLowerCase();
+        String url = metaData.getURL().toLowerCase();
+        String driverName = metaData.getDriverName().toLowerCase();
+
+        // Проверяем по productName (самый надежный способ)
+        if (productName.contains("mysql")) {
+            return "MySQL";
+        }
+        if (productName.contains("mariadb")) {
+            return "MariaDB";
+        }
+        if (productName.contains("oracle")) {
+            return "Oracle";
+        }
+        if (productName.contains("postgresql") || productName.contains("postgres")) {
+            return "PostgreSQL";
+        }
+        if (productName.contains("sql server") || productName.contains("microsoft sql")) {
+            return "Microsoft SQL Server";
+        }
+        if (productName.contains("h2")) {
+            return "H2";
+        }
+        if (productName.contains("hsql") || productName.contains("hsqldb")) {
+            return "HSQLDB";
+        }
+        if (productName.contains("derby")) {
+            return "Apache Derby";
+        }
+        if (productName.contains("db2")) {
+            return "IBM DB2";
+        }
+        if (productName.contains("sqlite")) {
+            return "SQLite";
+        }
+
+        // Если productName не помог, проверяем URL
+        if (url.contains("mysql")) {
+            return "MySQL";
+        }
+        if (url.contains("mariadb")) {
+            return "MariaDB";
+        }
+        if (url.contains("oracle")) {
+            return "Oracle";
+        }
+        if (url.contains("postgresql")) {
+            return "PostgreSQL";
+        }
+        if (url.contains("sqlserver")) {
+            return "Microsoft SQL Server";
+        }
+        if (url.contains("h2")) {
+            return "H2";
+        }
+        if (url.contains("hsqldb")) {
+            return "HSQLDB";
+        }
+        if (url.contains("derby")) {
+            return "Apache Derby";
+        }
+        if (url.contains("db2")) {
+            return "IBM DB2";
+        }
+        if (url.contains("sqlite")) {
+            return "SQLite";
+        }
+
+        // Если ничего не помогло - возвращаем детальную информацию
+        return "Unknown (" + productName + ", driver: " + driverName + ", URL: " + url + ")";
     }
 }

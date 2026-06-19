@@ -51,7 +51,8 @@ tasks.register("sapSdaFromLibs", SdaFromLibs::class.java) {
         project.file("libs/commons-io-2.22.0.jar"),
         project.file("libs/commons-lang3-3.20.0.jar"),
         project.file("libs/mssql-jdbc-12.6.5.jre8.jar"),
-        project.file("libs/mysql-connector-j-9.4.0.jar")
+        project.file("libs/mysql-connector-j-9.4.0.jar"),
+        project.file("libs/mariadb-java-client-3.5.9.jar")
     )
     doLast {
         buildSDA()
