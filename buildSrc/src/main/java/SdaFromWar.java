@@ -47,6 +47,7 @@ public abstract class SdaFromWar extends DefaultTask {
         String version = Objects.requireNonNull(props.getProperty("adapterVersion"));
         String vendorName = Objects.requireNonNull(props.getProperty("adapterVendor"));
         String vendorLocation = Objects.requireNonNull(props.getProperty("adapterVendorLocation"));
+        String dcNameLib = Objects.requireNonNull(props.getProperty("dcNameLib"));
         String warName = getDcName().get() + ".war";
 
         String keyCounter = version + "." + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddhhmmss"));
@@ -60,7 +61,8 @@ public abstract class SdaFromWar extends DefaultTask {
 
         List<DeployReference> deployReferenceList = new LinkedList<>();
         deployReferenceList.addAll(Dependencies.deployReferenceList);
-//        deployReferenceList.add(new DeployReference("hard", "library", vendorName, dcNameLib));
+        DeployReference dref = new DeployReference("weak", "library", vendorName, dcNameLib);
+        deployReferenceList.add(dref);
 
         OutputStream os = new FileOutputStream(sdaFile);
         ZipOutputStream zos = new ZipOutputStream(os, StandardCharsets.UTF_8);
