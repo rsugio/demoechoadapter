@@ -15,14 +15,17 @@ import java.io.PrintWriter;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 public class JdbcServlet extends HttpServlet {
+    //TODO добавить слушатель изменений
     ApplicationPropertiesAccess applicationConfiguration = null;
     Properties config = null;
     DataSource dataSource = null;
     Connection conn = null;
     Exception initException = null;
+    String query = null;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -42,6 +45,9 @@ public class JdbcServlet extends HttpServlet {
             if (jdbcSelector == null || jdbcSelector.isEmpty()) {
                 return;
             }
+            query = this.config.getProperty(jdbcSelector + ".query");
+            if (query!=null) query = query.trim();
+
             String driverClassName = this.config.getProperty(jdbcSelector + ".driverClassName");
             String url = this.config.getProperty(jdbcSelector + ".url");
             String username = this.config.getProperty(jdbcSelector + ".username");
@@ -57,15 +63,14 @@ public class JdbcServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        PrintWriter pw = new PrintWriter(resp.getOutputStream());
         if (initException != null) {
-            PrintWriter pw = new PrintWriter(resp.getOutputStream());
             resp.setContentType("text/plain; charset=utf-8");
             pw.printf("Cannot work. Initialization error: %s", initException.getMessage());
             pw.close();
-            resp.sendError(500);
+//            resp.sendError(500);
             return;
         }
-        PrintWriter pw = new PrintWriter(resp.getOutputStream());
         resp.setContentType("text/plain; charset=utf-8");
         pw.println(JdbcServlet.class.getName());
         pw.println(conn);
@@ -78,6 +83,11 @@ public class JdbcServlet extends HttpServlet {
                 case "MariaDB": mariadb(pw); break;
                 default: pw.println("Not implemented for this vendor");
             }
+            if (query!=null && !query.isEmpty()) {
+                pw.println("\nCustom query: " + query);
+                executeStatement(pw, conn.prepareStatement(query));
+            }
+            pw.println("EOF");
         } catch (Exception e) {
             e.printStackTrace(pw);
         }
@@ -94,7 +104,10 @@ public class JdbcServlet extends HttpServlet {
                 "    update_time,\n" +
                 "    table_comment\n" +
                 "FROM information_schema.tables\n" +
-                "WHERE table_schema <> 'information_schema'\n" +
+                "WHERE table_schema <> 'information_schema' " +
+                "  AND table_schema <> 'performance_schema' " +
+                "  AND table_schema <> 'mysql' " +
+                "  AND table_schema <> 'sys'\n" +
                 "ORDER BY table_schema, table_type, table_name;";
         String fields = "-- Структура таблицы (колонки, типы, ключи)\n" +
                 "SELECT table_name, ordinal_position, \n" +
@@ -247,7 +260,7 @@ public class JdbcServlet extends HttpServlet {
             while (rs.next()) {
                 List<String> row = new ArrayList<>();
                 for (int i = 1; i <= columnCount; i++) {
-                    String value = getStringValue(rs, i, metaData.getColumnType(i));
+                    String value = Objects.requireNonNull(getStringValue(rs, i, metaData.getColumnType(i)));
                     value = value
                             .replace('\n', ' ')
                             .replace('\r', ' ')
@@ -263,7 +276,7 @@ public class JdbcServlet extends HttpServlet {
             }
 
             // Ограничиваем ширину для читаемости (опционально)
-            int maxColumnWidth = 100;
+            int maxColumnWidth = 120;
             for (int i = 0; i < columnWidths.size(); i++) {
                 if (columnWidths.get(i) > maxColumnWidth) {
                     columnWidths.set(i, maxColumnWidth);
@@ -279,7 +292,7 @@ public class JdbcServlet extends HttpServlet {
             }
 
             // Выводим заголовок
-            pw.println(separator.toString());
+            pw.println(separator);
             pw.print("|");
             for (int i = 0; i < columnCount; i++) {
                 String header = padRight(columnNames.get(i), columnWidths.get(i));
